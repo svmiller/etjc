@@ -3,7 +3,7 @@ The Effect of Terrorism on Judicial Confidence
 
 This project argues there is a statistically significant (i.e. discernible from zero) interaction between judicial independence and terror threats on individual-level judicial confidence. I argue citizens in states living under high terror threats lose confidence in their judiciary even when it is honest and fair. Citizens see these institutions that otherwise legitimate democracy and enforce contracts as interference with executive-led counter-terrorism policies. Citizens in states *without* independent judiciaries *gain* confidence in these institutions by contrast. Systems in this case have co-opted legal processes provided by independent judiciaries into devices like military tribunals and other legal "black holes".
 
-This is currently forthcoming at *Political Research Quarterly*. This repository contains the manuscript, appendix, a presentation version, and code for replication.
+This is currently forthcoming at *Political Research Quarterly*. This repository contains the manuscript, appendix, and code for replication.
 
 ## Abstract
 
