@@ -69,7 +69,7 @@ source('analysis/2b-clean-evs-macro.R')
 ```
 
 ```{r analysis, echo=F, message=F, warning=F, error=F, cache=T}
-source('analysis/3-analysis.R') 
+source('analysis/3-analysis.R')
 ```
 
 # Introduction

@@ -50,7 +50,7 @@ Regtable <- capture.output(stargazer(M1, M2, M3, M4, style = "ajps", header=FALS
                                        "Judicial Independence", "Judicial Inefficiency", 
                                        "Level of Terrorism*Judicial Independence"), 
                     omit=c("Constant"), model.names = FALSE, dep.var.labels.include = FALSE, 
-                    notes=c("* $p$ $<$ 0.05 (Micro-level)"), omit.stat =c("aic","ll","bic"), 
+                    notes=c("* $p$ $<$ 0.05"), omit.stat =c("aic","ll","bic"), 
                     star.cutoffs = c(.05, NA, NA), 
                     star.char = c("*", "*", "*"), digit.separator=",", label="tab:regtable"))
 
