@@ -1,0 +1,838 @@
+\documentclass[11pt,]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\newcommand*{\authorfont}{\fontfamily{phv}\selectfont}
+\usepackage[sc, osf]{mathpazo}
+
+
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+
+
+
+\usepackage{abstract}
+\renewcommand{\abstractname}{}    % clear the title
+\renewcommand{\absnamepos}{empty} % originally center
+
+\renewenvironment{abstract}
+ {{%
+    \setlength{\leftmargin}{0mm}
+    \setlength{\rightmargin}{\leftmargin}%
+  }%
+  \relax}
+ {\endlist}
+
+\makeatletter
+\def\@maketitle{%
+  \newpage
+%  \null
+%  \vskip 2em%
+%  \begin{center}%
+  \let \footnote \thanks
+    {\fontsize{18}{20}\selectfont\raggedright  \setlength{\parindent}{0pt} \@title \par}%
+}
+%\fi
+\makeatother
+
+
+\renewcommand*\thetable{A.\arabic{table}}
+\renewcommand*\thefigure{A.\arabic{figure}}
+
+
+\setcounter{secnumdepth}{0}
+
+\usepackage{longtable,booktabs}
+
+\usepackage{graphicx}
+% We will generate all images so they have a width \maxwidth. This means
+% that they will get their normal width if they fit onto the page, but
+% are scaled down if they would overflow the margins.
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+\else\Gin@nat@width\fi}
+\makeatother
+\let\Oldincludegraphics\includegraphics
+\renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
+
+\title{The Effect of Terrorism on Judicial Confidence: Supplemental Appendix  }
+
+
+
+\author{\Large Steven V. Miller\vspace{0.05in} \newline\normalsize\emph{Clemson University}  }
+
+
+\date{}
+
+\usepackage{titlesec}
+
+\titleformat*{\section}{\normalsize\bfseries}
+\titleformat*{\subsection}{\normalsize\itshape}
+\titleformat*{\subsubsection}{\normalsize\itshape}
+\titleformat*{\paragraph}{\normalsize\itshape}
+\titleformat*{\subparagraph}{\normalsize\itshape}
+
+
+\usepackage{natbib}
+\bibliographystyle{apsr}
+
+
+
+\newtheorem{hypothesis}{Hypothesis}
+\usepackage{setspace}
+
+\makeatletter
+\@ifpackageloaded{hyperref}{}{%
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+}
+\@ifpackageloaded{color}{
+    \PassOptionsToPackage{usenames,dvipsnames}{color}
+}{%
+    \usepackage[usenames,dvipsnames]{color}
+}
+\makeatother
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={Steven V. Miller (Clemson University)},
+             pdfkeywords = {},  
+            pdftitle={The Effect of Terrorism on Judicial Confidence: Supplemental Appendix},
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}}
+\urlstyle{same}  % don't use monospace font for urls
+
+
+
+\begin{document}
+	
+% \pagenumbering{arabic}% resets `page` counter to 1 
+%%\renewcommand*{\thepage}{A--\arabic{page}}
+%
+% \maketitle
+
+{% \usefont{T1}{pnc}{m}{n}
+\setlength{\parindent}{0pt}
+\thispagestyle{plain}
+{\fontsize{18}{20}\selectfont\raggedright 
+\maketitle  % title \par  
+
+}
+
+{
+   \vskip 13.5pt\relax \normalsize\fontsize{11}{12} 
+\textbf{\authorfont Steven V. Miller} \hskip 15pt \emph{\small Clemson University}   
+
+}
+
+}
+
+
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+
+
+\vskip 6.5pt
+
+\noindent  \newpage 
+
+\section{Introduction}\label{introduction}
+
+This is the supplemental appendix to ``The Effect of Terrorism on
+Judicial Confidence,'' a manuscript set to appear in \emph{Political
+Research Quarterly}. The supplemental appendix, like the manuscript, is
+a dynamic document that automatically generates the code presenting the
+results within the document itself \citep{xie2013ddrk}. This approach to
+document preparation has multiple benefits, namely in the ability to
+drive the incidence of transcription error to zero while calling
+specific results into the document. I will make some references in this
+document to specific statistics that the raw markup will show is a
+direct extrapolation from code into presentation. The raw markup is
+available upon request and will be available on my personal Github
+account upon publication. This will facilitate transparency in published
+statistical analysis, consistent with the
+\href{http://www.dartstatement.org/}{Data Access and Research
+Transparency Initiative} (DA-RT) by the American Political Science
+Association.
+
+\section{Descriptive Statistics}\label{descriptive-statistics}
+
+I start the supplemental appendix with basic descriptive statistics for
+the variables I present in the manuscript. I choose to be brief in this
+section of the appendix since this information is descriptive and
+provides basic background information about the analyses I present in
+the manuscript. Table \ref{tab:cys} starts this section with a summary
+of the countries and years that appear in the analysis. The reader
+should note that despite appearing in the first two waves of European
+Values Survey data, Canada and the United States do not appear in the
+analyses I conduct.
+
+\begin{longtable}{lc|ccc}
+   \caption{Average Judicial Confidence, Terror Level, and Judicial Independence by Country-Year} 
+ \label{tab:cys} 
+ \\ \hline \hline 
+  & & \textbf{Average Confidence} & \textbf{Level of} & \textbf{Judicial} \\ 
+ \textbf{Country} & \textbf{Year} & \textbf{in Judiciary} & \textbf{Terror Threat} & \textbf{Independence} \\ \hline 
+    \endfirsthead 
+ \caption[]{Average Judicial Confidence, Terror Level, and Judicial Independence by Country-Year (continued)}  \\ \hline 
+  & & \textbf{Average Confidence} & \textbf{Level of} & \textbf{Judicial} \\ 
+ \textbf{Country} & \textbf{Year} & \textbf{in Judiciary} & \textbf{Terror Threat} & \textbf{Independence} \\ \hline 
+ \endhead 
+  \multicolumn{5}{r}{\footnotesize \emph{Continued on next page...}} 
+ \\                    
+                                 \endfoot
+        \hline \hline
+                                 \endlastfoot 
+Norway & 1982 & 0.839 & 3.045 & Yes \\ 
+  Sweden & 1982 & 0.732 & 2.944 & Yes \\ 
+  Malta & 1983 & 0.483 & 0.000 & Yes \\ 
+  Iceland & 1984 & 0.689 & 2.833 & Yes \\ 
+  Austria & 1990 & 0.584 & 5.591 & Yes \\ 
+  Belgium & 1990 & 0.465 & 6.380 & Yes \\ 
+  Denmark & 1990 & 0.794 & 3.892 & Yes \\ 
+  Finland & 1990 & 0.663 & 1.386 & Yes \\ 
+  France & 1990 & 0.575 & 7.929 & Yes \\ 
+  Iceland & 1990 & 0.666 & 1.099 & Yes \\ 
+  Ireland & 1990 & 0.472 & 5.976 & Yes \\ 
+  Italy & 1990 & 0.318 & 7.576 & Yes \\ 
+  Netherlands & 1990 & 0.629 & 6.240 & Yes \\ 
+  Norway & 1990 & 0.752 & 3.664 & Yes \\ 
+  Poland & 1990 & 0.525 & 0.000 & Yes \\ 
+  Portugal & 1990 & 0.442 & 5.578 & Yes \\ 
+  Spain & 1990 & 0.440 & 9.545 & Yes \\ 
+  Sweden & 1990 & 0.559 & 4.127 & Yes \\ 
+  United Kingdom & 1990 & 0.525 & 9.105 & Yes \\ 
+  Bulgaria & 1991 & 0.455 & 4.394 & No \\ 
+  Czechoslovakia & 1991 & 0.443 & 5.342 & Yes \\ 
+  Hungary & 1991 & 0.596 & 2.197 & Yes \\ 
+  Malta & 1991 & 0.398 & 3.178 & Yes \\ 
+  Romania & 1993 & 0.476 & 4.111 & No \\ 
+  Austria & 1999 & 0.681 & 4.749 & Yes \\ 
+  Belgium & 1999 & 0.366 & 5.944 & Yes \\ 
+  Bulgaria & 1999 & 0.269 & 5.935 & No \\ 
+  Croatia & 1999 & 0.306 & 5.063 & No \\ 
+  Czech Republic & 1999 & 0.230 & 4.718 & Yes \\ 
+  Denmark & 1999 & 0.785 & 2.565 & Yes \\ 
+  Estonia & 1999 & 0.327 & 3.850 & Yes \\ 
+  France & 1999 & 0.462 & 7.340 & Yes \\ 
+  Germany & 1999 & 0.574 & 7.402 & Yes \\ 
+  Greece & 1999 & 0.437 & 8.102 & Yes \\ 
+  Hungary & 1999 & 0.442 & 6.236 & Yes \\ 
+  Iceland & 1999 & 0.736 & 0.000 & Yes \\ 
+  Ireland & 1999 & 0.556 & 5.384 & Yes \\ 
+  Italy & 1999 & 0.315 & 6.332 & Yes \\ 
+  Latvia & 1999 & 0.472 & 5.951 & No \\ 
+  Lithuania & 1999 & 0.167 & 3.932 & Yes \\ 
+  Luxembourg & 1999 & 0.598 & 1.386 & Yes \\ 
+  Malta & 1999 & 0.450 & 2.996 & Yes \\ 
+  Netherlands & 1999 & 0.475 & 5.449 & Yes \\ 
+  Poland & 1999 & 0.431 & 5.981 & Yes \\ 
+  Portugal & 1999 & 0.423 & 3.367 & Yes \\ 
+  Romania & 1999 & 0.401 & 2.079 & No \\ 
+  Russia & 1999 & 0.366 & 9.277 & No \\ 
+  Slovakia & 1999 & 0.355 & 6.084 & No \\ 
+  Slovenia & 1999 & 0.437 & 3.314 & Yes \\ 
+  Spain & 1999 & 0.423 & 8.233 & Yes \\ 
+  Sweden & 1999 & 0.608 & 4.227 & Yes \\ 
+  Ukraine & 1999 & 0.327 & 4.816 & No \\ 
+  United Kingdom & 1999 & 0.471 & 6.968 & Yes \\ 
+  Belarus & 2000 & 0.464 & 4.890 & No \\ 
+  Finland & 2000 & 0.667 & 0.916 & Yes \\ 
+  Turkey & 2001 & 0.573 & 9.582 & No \\ 
+  Albania & 2008 & 0.252 & 0.693 & No \\ 
+  Armenia & 2008 & 0.418 & 4.727 & No \\ 
+  Austria & 2008 & 0.636 & 5.220 & Yes \\ 
+  Azerbaijan & 2008 & 0.686 & 4.727 & No \\ 
+  Belarus & 2008 & 0.617 & 2.565 & No \\ 
+  Bosnia and Herzegovina & 2008 & 0.389 & 5.472 & No \\ 
+  Bulgaria & 2008 & 0.176 & 0.000 & No \\ 
+  Croatia & 2008 & 0.195 & 1.946 & No \\ 
+  Cyprus & 2008 & 0.670 & 4.554 & Yes \\ 
+  Czech Republic & 2008 & 0.350 & 0.693 & No \\ 
+  Denmark & 2008 & 0.871 & 0.000 & Yes \\ 
+  Estonia & 2008 & 0.547 & 0.000 & Yes \\ 
+  France & 2008 & 0.555 & 6.625 & Yes \\ 
+  Georgia & 2008 & 0.314 & 6.297 & No \\ 
+  Germany & 2008 & 0.525 & 5.649 & Yes \\ 
+  Greece & 2008 & 0.508 & 7.780 & No \\ 
+  Hungary & 2008 & 0.383 & 0.000 & Yes \\ 
+  Ireland & 2008 & 0.505 & 5.421 & Yes \\ 
+  Latvia & 2008 & 0.437 & 5.030 & No \\ 
+  Lithuania & 2008 & 0.253 & 0.000 & Yes \\ 
+  Luxembourg & 2008 & 0.692 & 0.000 & Yes \\ 
+  Macedonia & 2008 & 0.378 & 5.466 & No \\ 
+  Malta & 2008 & 0.472 & 0.000 & Yes \\ 
+  Moldova & 2008 & 0.420 & 4.575 & No \\ 
+  Montenegro & 2008 & 0.439 & 4.977 & No \\ 
+  Netherlands & 2008 & 0.538 & 2.996 & Yes \\ 
+  Norway & 2008 & 0.783 & 4.060 & Yes \\ 
+  Poland & 2008 & 0.429 & 0.000 & Yes \\ 
+  Portugal & 2008 & 0.476 & 0.000 & Yes \\ 
+  Romania & 2008 & 0.415 & 0.000 & No \\ 
+  Russia & 2008 & 0.414 & 9.859 & No \\ 
+  Serbia & 2008 & 0.245 & 0.000 & No \\ 
+  Slovakia & 2008 & 0.349 & 0.000 & No \\ 
+  Slovenia & 2008 & 0.473 & 0.000 & Yes \\ 
+  Spain & 2008 & 0.427 & 8.760 & Yes \\ 
+  Switzerland & 2008 & 0.739 & 4.970 & Yes \\ 
+  Ukraine & 2008 & 0.251 & 2.918 & No \\ 
+  Belgium & 2009 & 0.510 & 4.043 & Yes \\ 
+  Finland & 2009 & 0.724 & 6.023 & Yes \\ 
+  Iceland & 2009 & 0.674 & 0.000 & Yes \\ 
+  Italy & 2009 & 0.361 & 5.717 & No \\ 
+  Sweden & 2009 & 0.684 & 5.069 & Yes \\ 
+  Turkey & 2009 & 0.810 & 9.386 & No \\ 
+  United Kingdom & 2009 & 0.513 & 8.008 & Yes \\ 
+  \hline
+\end{longtable}
+
+Table \ref{tab:descript} is basic table of descriptive statistics for
+all variables used in Table 1 of the manuscript. Recall that all
+macro-level variables were group-centered (on the survey wave) and
+standardized by two standard deviations. This scaling was done on a
+macro-level data frame of the country-years used in the analysis and
+prior to a merge into the micro-level data frame (of individual-level
+survey respondents). This is why the scaled micro-level variables all
+have means of zero and standard deviations of .5 while the macro-level
+variables slightly deviate from this set mean and standard deviation.
+
+\begin{table}[!htbp] \centering 
+  \caption{Descriptive Statistics for Variables Used in the Analysis} 
+  \label{tab:descript} 
+\begin{tabular}{@{\extracolsep{5pt}}lccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Judicial Confidence & 151,235 & 0.495 & 0.500 & 0 & 1 \\ 
+Age & 156,190 & 0.000 & 0.500 & $-$1.090 & 1.742 \\ 
+Female & 156,683 & 0.542 & 0.498 & 0 & 1 \\ 
+College Education & 106,016 & 0.101 & 0.301 & 0 & 1 \\ 
+Income Groups & 130,681 & $-$0.000 & 0.500 & $-$0.889 & 0.979 \\ 
+Unemployed & 155,219 & 0.075 & 0.263 & 0 & 1 \\ 
+Confidence in Parliament & 147,560 & $-$0.000 & 0.500 & $-$1.421 & 1.773 \\ 
+Level of Democracy & 152,226 & 0.000 & 0.500 & $-$1.444 & 0.807 \\ 
+Real GDP per Capita & 152,522 & 0.000 & 0.500 & $-$1.267 & 0.927 \\ 
+Level of Terrorism & 146,449 & 0.000 & 0.500 & $-$1.182 & 1.021 \\ 
+Judicial Independence & 139,103 & 0.666 & 0.472 & 0 & 1 \\ 
+Judicial Inefficiency & 62,685 & 0.000 & 0.500 & $-$0.611 & 1.895 \\ 
+Post-9/11 Dummy & 156,738 & 0.426 & 0.495 & 0 & 1 \\ 
+Western Europe Dummy & 156,738 & 0.583 & 0.493 & 0 & 1 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+Figure \ref{fig:corrmat} provides a correlation matrix of the variables
+used in the analysis to address preliminary concerns of
+multicollinearity.\footnote{There is no correlation coefficient for the
+  post-9/11 dummy and judicial ineffiency because the \emph{Doing
+  Business} project, which is responsible for the judicial ineffiency
+  data, starts after 9/11.} A correlation matrix presented akin to a
+``heat map'' has multiple benefits over a standard correlation matrix.
+It weights the visibility of the correlation coefficient by how high the
+absolute value of Pearson's \emph{r}, drawing the reader's attention to
+only the important potential sources of collinearity. A standard
+correlation matrix, by contrast, presents low correlation coefficients
+visually equivalent to high correlation coefficients, which places an
+extra burden on the reader to gleam the relevant information. For
+example, it is of no interest that age and confidence in parliament
+correlate at 0.069 while the correlation coefficient between the Western
+Europe dummy and GDP per capita (\emph{r} = 0.674) is more important to
+know for the reader and the researcher. A correlation matrix as ``heat
+map'' downplays irrelevant information and emphasizes important
+information.
+
+There are a few conspicuous correlation coefficients for variables for
+which there is an intuitive relationship. Western Europe scores high in
+democracy relative to other countries in Europe (\emph{r} = 0.607) and
+Western Europe is wealthier than other countries in Europe (\emph{r} =
+0.674). Democracy and economic wealth travel together (\emph{r} =
+0.773), an observation well-known to scholars interested in the exact
+relationship between economic development and democracy
+\citep[e.g.][]{przeworskietal2000dd}. Likewise, judicial independence is
+prominent in Western Europe (\emph{r} = 0.683) and among countries
+scoring higher in democracy. (\emph{r} = 0.665). This does not surprise
+those who see Western Europe as more democratic than its other peers in
+Europe and for scholars who think that judicial independence could be a
+``necessary condition'' for the observation of democracy
+\citep[e.g.][]{howardcasey2003ijnd}. However, it does suggest a concern
+of collinearity in the coefficients. I address this concern with
+robustness checks in the next section.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/corrplot-1.pdf}
+\caption{\label{fig:corrmat} A Correlation Matrix of the Items Used in
+the Analysis}
+\end{figure}
+
+\section{Additional Models and Robustness
+Checks}\label{additional-models-and-robustness-checks}
+
+This section of the appendix discusses a multitude of robustness checks
+I conducted in addition to the main findings I report in the manuscript.
+For simplicity, I choose to present the results of almost all models as
+coefficient plots rather than regression tables. The rationale here is
+both aesthetic and practical. Coefficient plots are visually appealing
+and allow for more regression summaries in a smaller space.
+
+I further focus most of the robustness tests on what I present as Model
+2 in Table 1 in the manuscript. All robustness concerns raised by
+anonymous reviewers focused on macro-level variables. Micro-level
+coefficients typically have little bearing on macro-level coefficients
+(and vice-versa) in multi-level models (beyond concerns of non-random
+data loss).
+
+Figure \ref{fig:corrfixef}, a correlation of fixed effects of Model 4
+from the manuscript, highlights this negligible effect of micro-level
+fixed effects on macro-level fixed effects. A correlation matrix of
+fixed effects in a mixed effects model differs in interpretation from a
+correlation matrix of raw variables. In this application, they give an
+approximation of the correlation of the regression coefficients. Put
+another way, they give us an estimate of what would happen to other
+regression coefficients in the model if a particular regression
+coefficient increased or decreased in magnitude.\footnote{For further
+  discussion:
+  \url{https://stat.ethz.ch/pipermail/r-sig-mixed-models/2009q1/001941.html}}
+Notice the bottom-left quadrant of this is almost completely white. This
+indicates there is practically no discernible effect of a macro-level
+fixed effect on a micro-level fixed effect. This is true even for the
+parliamentary confidence fixed effect, which is the most robust and
+precise fixed effect in any model I estimate.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/corrfixef-1.pdf}
+\caption{\label{fig:corrfixef} A Correlation Matrix of the Fixed Effects
+in Model 4 in the Manuscript}
+\end{figure}
+
+\subsection{Assessing the Effects of Western Europe, Democracy, and Real
+GDP per
+Capita}\label{assessing-the-effects-of-western-europe-democracy-and-real-gdp-per-capita}
+
+I start the robustness tests with a series of regressions that rotate
+out some variables that may cause collinearity concerns indicated in
+Figure \ref{fig:corrmat}. These are the real GDP per capita variable,
+the Western Europe dummy, and the level of democracy variable. Figure
+\ref{fig:coefstep} summarizes the results of a series of different
+specifications for Model 2 in the manuscript in which I either omit the
+democracy variable, Western Europe dummy, or real GDP per capita
+variable or make that variable the only specified fixed effect among the
+three variables that all correlate at high levels.
+
+The results I summarize in Figure \ref{fig:coefstep} suggest few
+meaningful changes to these parameters contingent on the model
+specification. The Western Europe dummy is positive and significant in
+all models in which it is estimated. The democracy variable does not
+obtain statistical significance in any model in which it is estimated.
+Its inclusion in a particular model has no bearing on the parameter for
+judicial independence. The only meaningful change concerns the effect of
+real GDP per capita on judicial confidence, which we observe contingent
+on the model specification. Its parameter yields a \emph{p} value we can
+discern from zero when 1) it is the only one of three correlated
+variables included in the model or 2) the Western Europe dummy is
+excluded. It is not significant when Western Europe is included and
+democracy is excluded or when all three are estimated in the same model
+(as Model 2 in the manuscript).
+
+Importantly, none of the macro-level parameters of interest in the
+manuscript (i.e.~terror threats, judicial independence, and their
+interaction) are affected by these different model specifications. The
+concern of correlation among these three variables has implications
+\emph{only} for the regression parameters for these three variables, not
+the variables of interest in the manuscript.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/stepwise-1.pdf}
+\caption{\label{fig:coefstep} Coefficient Plot of Different
+Specifications for Model 2}
+\end{figure}
+
+\subsection{A Replication with an Ordinal Logistic Mixed Effects
+Model}\label{a-replication-with-an-ordinal-logistic-mixed-effects-model}
+
+The next robustness tests maintains the ordinal level of the dependent
+variable and re-estimates the models in Table 1 of the manuscript as
+ordinal logistic mixed effects models. Table \ref{tab:ordinaltab}
+contains the results of these regressions.
+
+\begin{table}
+\begin{center}
+\caption{Ordinal Mixed Effects Models of Judicial Confidence in European Values Survey}
+\label{tab:ordinaltab}
+\begin{tabular}{l c c c c }
+\hline
+ & Model 1 & Model 2 & Model 3 & Model 4 \\
+\hline
+Age                                      &                &                & $-0.029^{*}$   & $-0.026$       \\
+                                         &                &                & $(0.014)$      & $(0.019)$      \\
+Female                                   &                &                & $0.093^{***}$  & $0.078^{***}$  \\
+                                         &                &                & $(0.014)$      & $(0.018)$      \\
+College Educated                         &                &                & $-0.065^{**}$  & $-0.031$       \\
+                                         &                &                & $(0.022)$      & $(0.030)$      \\
+Income Group                             &                &                & $-0.027$       & $-0.015$       \\
+                                         &                &                & $(0.014)$      & $(0.019)$      \\
+Unemployed                               &                &                & $-0.069^{**}$  & $-0.046$       \\
+                                         &                &                & $(0.026)$      & $(0.032)$      \\
+Confidence in Parliament                 &                &                & $1.924^{***}$  & $1.972^{***}$  \\
+                                         &                &                & $(0.015)$      & $(0.020)$      \\
+Post-9/11 Dummy                          & $0.102$        & $0.094$        & $0.145$        &                \\
+                                         & $(0.083)$      & $(0.079)$      & $(0.100)$      &                \\
+Western Europe Dummy                     & $0.998^{***}$  & $0.936^{***}$  & $0.888^{**}$   & $0.717$        \\
+                                         & $(0.234)$      & $(0.213)$      & $(0.306)$      & $(0.379)$      \\
+Level of Democracy                       & $-0.352^{*}$   & $-0.273$       & $-0.151$       & $-0.196$       \\
+                                         & $(0.175)$      & $(0.164)$      & $(0.252)$      & $(0.348)$      \\
+Real GDP per Capita                      & $0.003$        & $0.039$        & $0.180$        & $0.717^{*}$    \\
+                                         & $(0.199)$      & $(0.185)$      & $(0.267)$      & $(0.361)$      \\
+Level of Terrorism                       & $-0.115$       & $1.016^{***}$  & $1.204^{***}$  & $1.441^{***}$  \\
+                                         & $(0.108)$      & $(0.289)$      & $(0.326)$      & $(0.403)$      \\
+Judicial Independence                    & $-0.025$       & $-0.018$       & $-0.054$       & $-0.113$       \\
+                                         & $(0.123)$      & $(0.113)$      & $(0.134)$      & $(0.207)$      \\
+Level of Terrorism*Judicial Independence &                & $-0.664^{***}$ & $-0.711^{***}$ & $-1.006^{***}$ \\
+                                         &                & $(0.160)$      & $(0.185)$      & $(0.260)$      \\
+Judicial Inefficiency                    &                &                &                & $-0.424^{*}$   \\
+                                         &                &                &                & $(0.180)$      \\
+\hline
+Num. obs.                                & 130530         & 130530         & 80635          & 47870          \\
+Groups (countryyear)                     & 100            & 100            & 76             &                \\
+Groups (country)                         & 45             & 45             & 44             & 42             \\
+Variance: countryyear: (Intercept)       & 0.082          & 0.075          & 0.088          &                \\
+Variance: country: (Intercept)           & 0.242          & 0.185          & 0.243          & 0.327          \\
+1|2                                      & $-1.343^{***}$ & $-1.339^{***}$ & $-1.575^{***}$ & $-1.839^{***}$ \\
+                                         & $(0.222)$      & $(0.207)$      & $(0.290)$      & $(0.313)$      \\
+2|3                                      & $0.610^{**}$   & $0.614^{**}$   & $0.622^{*}$    & $0.346$        \\
+                                         & $(0.222)$      & $(0.207)$      & $(0.290)$      & $(0.313)$      \\
+3|4                                      & $2.895^{***}$  & $2.899^{***}$  & $3.274^{***}$  & $3.081^{***}$  \\
+                                         & $(0.222)$      & $(0.207)$      & $(0.290)$      & $(0.314)$      \\
+\hline
+\multicolumn{5}{l}{\scriptsize{$^{***}p<0.001$, $^{**}p<0.01$, $^*p<0.05$}}
+\end{tabular}
+\end{center}
+\end{table}
+
+There are a few differences between Table \ref{tab:ordinaltab} and Table
+1 in the manuscript. The effect of unemployment had no discernible
+effect on judicial confidence in Table 1 when I condense the dependent
+variable to a dichotomous measure of judicial confidence. The parameter
+for unemployed status of the respondent is negative and significant in
+Model 3 in Table \ref{tab:ordinaltab}; individual-level unemployment
+decreases individual-level judicial confidence in the third and fourth
+waves. Similarly, college education is positive and significant in Model
+3 in Table \ref{tab:ordinaltab} though not in Model 4. The effect of the
+Western Europe dummy fails to reach statistical significance in Model 4
+in Table \ref{tab:ordinaltab}. The nature of data loss affected the
+parameter estimate for the Western Europe dummy in the analyses on the
+fourth wave when the ordinal information of the dependent variable is
+preserved and modeled, though the effect of the Western Europe dummy was
+robust to the data loss and subsetting of survey waves in Table 1 in the
+manuscript. The final changes concern the level of democracy in Model 1
+and real GDP per capita variable in Model 4. Both attain statistical
+significance in Table \ref{tab:ordinaltab} though are insignificant
+across all estimations in Table 1 in the manuscript. The astute reader
+will see this is a chance fluctuation in the parameter estimates. Both
+parameters were actually significant at the .10 level with \emph{p}
+values approaching .05, but below the hard cut-off I institute in the
+analyses. Informed readers would know not to make too much into this
+change in \emph{p} value contingent on the different model specification
+\citep[e.g.][]{gelmanstern2006dbs}.
+
+This, however, is the full extent of changes between Table 1 in the
+manuscript and Table \ref{tab:ordinaltab}. The parameter estimates for
+the level of terror threats, judicial independence, and the interaction
+between them, are unchanged when the ordinal nature of the dependent
+variable is modeled rather than condensed to a binary measure.
+
+\subsection{A Myriad of Different Ways to Model Terror
+Threats}\label{a-myriad-of-different-ways-to-model-terror-threats}
+
+I next consider the possibility that the relationships I observe for the
+macro-level parameters of interest in Table 1 are a function of the way
+in which I code terrorism. I justify my decision in the manuscript by
+noting my procedure is identical to how the \emph{Global Terrorism
+Index} (GTI) \citeyearpar{gti2014} codes terrorism in its database. The
+benefits are multiple, namely in its ability to model and weight terror
+incidents in the years prior to the observation year. However, this is
+just one way to code terror threats. The robustness of my results may
+depend on the ability to replicate them with different methods of
+modeling terror threats.
+
+Figure \ref{fig:otherterrmods2} summarizes a replication of Model 2
+using ten different specifications for terror threat levels. The first
+specification is a latent terror threat specification from an item
+response model \citep{samejima1969ela} that produces a continuous
+estimate of terror threats from the number of terror incidents, the
+number of successful terror incidents, the number of people killed, the
+number of people wounded, and the extent of property damage for each of
+the five years prior to the observation year. The next two terror threat
+estimates focus on terror incidents that the \emph{Global Terrorism
+Database} (GTD) \citeyearpar{gtd2014} codes as having an international
+element (i.e.~for which the perpretators or logistics came from outside
+the country) or were purely domestic terror incidents. The next terror
+threat specification subsets terror attacks to those targeting the
+public rather than the government or military.\footnote{A terrorist
+  attack that targets the public includes those targeting businesses,
+  abortion-related services, aircraft (which includes airline
+  employees), educational institutions, food and water supplies, private
+  property, religious figures and institutions, telecommunications,
+  tourists, and public transportation. This measure omits attacks
+  against the government, the police, the military, diplomats,
+  journalists, maritime ports/facilities, non-governmental
+  organizations, terrorists, utilities (e.g.~oil pipelines), unknown
+  targets, and violent political parties.} The next five terror threat
+specifications are the sum of the constituent elements of the terror
+threat index. These are just the sum of the number of incidents in the
+year prior to the observation year, the sum of the number of successful
+incidents, the sum of the number of people killed, the sum of the number
+of people wounded, and the sum of the property damage on GTD's ordinal
+scale. I finally include the GTI terror score that I coded and present
+in the manuscript for comparison.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/otherterrmods2-1.pdf}
+\caption{\label{fig:otherterrmods2} Coefficient Plot of Different Terror
+Threat Specifications for Model 2 in the Manuscript}
+\end{figure}
+
+Figure \ref{fig:otherterrmods2} summarizes these results of these ten
+different terror threat specifications, though I exclude a presentation
+of the controls for democracy, Western Europe, post-9/11 observations,
+and real GDP per capita to save space. The results of these regressions
+summarized in Figure \ref{fig:otherterrmods2} suggest that the findings
+consistent with my hypothesis are robust to a myriad of different
+specifications of terror threats. The effect of the terrorism variable
+is positive and statistically significant in each application. This is
+consistent with my contention that high terror threats increase judicial
+confidence in states without judicial independence. The effect of the
+interaction is negative and significant in each application. This is
+consistent with my contention that increasing terror threats decrease
+judicial confidence in states with judicial independence. Critically, my
+results do not depend on the measure of terrorism I use. The findings
+are the same even subsetting to just international terror incidents,
+domestic terror incidents, or terror incidents that target the public.
+
+\subsection{Potential Imbalances in the
+Data}\label{potential-imbalances-in-the-data}
+
+The manuscript includes partial effects for democracy, judicial
+independence, and a Western Europe dummy for data I draw from the
+European Values Survey. This leads to credible concerns for an imbalance
+in the data as democracy conditions almost all macro-level indicators I
+employ in the analysis. There are also more democracies in Europe than
+non-democracies. A simple democracy control variable that I use may be
+insufficient. I account for this issue with a coarsened exact matching
+on democracy \citep{iacusetal2012cibc} in the data. I describe the
+results below.
+
+The concern for imbalance rests on the macro-level variables in the
+analysis, which is why I restrict an imbalance check to a
+re-consideration of the results I report in Model 2 in Table 1 in the
+manuscript. For simplicity's sake, I condense a ``treatment'' variable
+of democracy that equals a 1 if the country has a \texttt{polity2} score
+\citep[c.f.][]{marshalljaggers2002piv} of 7 or greater in the given
+survey year. Thereafter, I assess balance on the possible variables in
+the model that democracy is likely to co-determine: the individual-level
+judicial confidence variable, the macro-level judicial independence
+variable, and the terror threat variable.
+
+A simple imbalance test of the raw data produces a multivariate
+imbalance measure (\(\mathcal{L}_1\)) of 0.594. Whereas
+\(\mathcal{L}_1\) is hard-bound between 0 (perfect balance, complete
+overlap between treatment and control) and 1 (perfect imbalance, no
+overlap between treatment and control), the \(\mathcal{L}_1\) statistic
+indicates a some important imbalance in the data. Coarsened exact
+matching on democracy yields more balance in the data. The multivariate
+imbalance measure (\(\mathcal{L}_1\)) decreases from 0.594 to 0.438
+after the coarsened exact matching procedure. However, Table
+\ref{tab:matchtab} shows that more balance came at the expense of sample
+size. Those familiar with matching know this as the balance-sample size
+frontier \citep{kingetal2017bssf}. Pruning observations from the
+original data frame provides more balance between treatment and control,
+but this balance comes at the expense of more precise parameter
+estimates in the statistical model. Likewise, a failure to prune
+anything from an original data set maximizes precision in a
+large-\emph{n} data frame, but leaves aside important questions of
+potential imbalance. The matching procedure I chose here ultimately
+prunes 29\% of the original data set for an increase in balance.
+
+\begin{table}[!htbp] \centering 
+  \caption{Summary of Matched and Unmatched Observations} 
+  \label{tab:matchtab} 
+\begin{tabular}{@{\extracolsep{5pt}} ccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & Control & Treatment \\ 
+\hline \\[-1.8ex] 
+All & $16,396$ & $114,134$ \\ 
+Matched & $16,396$ & $75,961$ \\ 
+Unmatched & $0$ & $38,173$ \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{\footnotesize$\mathcal{L}_1$ (unbalanced): 0.594; $\mathcal{L}_1$ (balanced): 0.438} \\ 
+\end{tabular} 
+\end{table}
+
+Figure \ref{fig:plotam29} shows my re-estimation of Model 2 with the
+balanced data, minus the democracy variable on which the data were
+balanced.\footnote{Figure \ref{fig:coefstep} suggests the level of
+  democracy variable ultimately has no bearing on individual-level
+  judicial confidence anyway.} It also includes the number of
+observations (92,357), and parameters of interest for the country-year
+random effect (number of country-years: 68, standard deviation: 0.320)
+and the country random effect (number of countries: 40, standard
+deviation: 0.416). It suggests that the potential loss of efficiency
+that follows the pruning of 29\% of the original data does not lead to a
+substantive change in the parameter estimates of importance to my
+hypotheses. There is still the significant interaction effect. Further,
+the parameter estimate for the constituent term of terror threats is
+still positive and significant as well. One somewhat interesting change
+is the judicial independence measure, which is still negative but now
+has a \emph{z}-value with more precision (\emph{z} = -1.482) albeit one
+that is still indiscernible from zero. Recall this is a constituent term
+in an interaction; the coefficient communicates a discernible decrease
+in individual-level judicial confidence for increasing judicial
+independence for citizens in states with the mean level of terror
+threats. A plot of predicted probabilities in Figure
+\ref{fig:plotam29pred}, similar to what I present in Figure 1 in the
+manuscript, does not suggest a substantively different interpretation of
+the interactive relationship between judicial independence and terror
+threats on individual-level judicial confidence with this coefficient
+for judicial independence. The results appear ``starker'' but the
+interpretation is ultimately the same.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/plotam29-1.pdf}
+\caption{\label{fig:plotam29} Coefficient Plot of Macro-level Model with
+Matched Data}
+\end{figure}
+
+Ultimately, matching, and pruning 29\% of the original data, do not
+change the important results I present in the manuscript.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/plotam29pred-1.pdf}
+\caption{\label{fig:plotam29pred} The Interaction between Judicial
+Independence and Terror Threats on Judicial Confidence from Figure
+\ref{fig:plotam29}}
+\end{figure}
+
+\subsection{Domestic Terror Threats and Varying Effects by
+Income}\label{domestic-terror-threats-and-varying-effects-by-income}
+
+Reviewer \#3 expressed an interest in possible heterogeneity of domestic
+terror threats by an individual-level attribute like income. This is
+difficult to evaluate with European Values Survey (EVS) data for a
+variety of reasons. Namely, EVS does not consistently ask
+sociodemographic questions across countries or waves. In fact, several
+important sociodemographic variables, like education, do not appear
+until the third wave of data in the late 1990s. Further, income
+questions vary considerably across countries and waves. The three-part
+ordinal income group variable I use in the manuscript represents the
+best means to standardize these income questions across all four waves,
+but the type of model for which R3 asked (a varying slope for terror
+threats across each level of the income group category) would balk at
+the idea of allowing a slope to vary for just three income groups. The
+ensuing parameter estimate would not be reliable.
+
+I identify a work-around to accommodate R3. The fourth wave of EVS asks
+a more granular question of income by reference to self-placement of
+annual income into income groups denominated in euros. These income
+categories are 1) less than 1,800 euros, 2) 1,800 euros to less than
+3,600 euros, 3) 3,600 euros to less than 6,000 euros, 4) 6,000 euros to
+less than 12,000 euros, 5) 12,000 euros to less than 18,000 euros, 6)
+18,000 euros to less than 24,000 euros, 7) 24,000 euros to less than
+30,000 euros, 8) 30,000 euros to less than 36,000 euros, 9) 36,000 euros
+to less than 60,000 euros, 10), 60,000 euros to less than 90,000 euros,
+11) 90,000 euros to less than 120,000 euros, and 12) 120,000 euros or
+more earned annually. The model that I then estimate is similar to Model
+4 in the manuscript, though it substitutes the fixed effect of the
+three-part income group variable for the random effect of the 12-item
+income group category and it replaces the terror threat variable with
+the domestic terror threat variable that I estimate and show in Figure
+\ref{fig:otherterrmods2}. I summarize the results with the coefficient
+plot in Figure \ref{fig:plotam30}, which includes other statistics of
+interest like the number of observations (47,870), and parameters of
+interest for the income group random effect (number of groups: 12,
+standard deviation: 0.078) and the country random effect (number of
+countries: 42, standard deviation: 0.596).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/plotam30-1.pdf}
+\caption{\label{fig:plotam30} Coefficient Plot of Correlates of Judicial
+Confidence in Fourth Wave of EVS}
+\end{figure}
+
+The results summarized in Figure \ref{fig:plotam30} square well with the
+results I provide in Model 4 in the manuscript. The gender fixed effect
+for women is statistically discernible from zero though its estimated
+effect is substantively small. The effect of confidence in parliament is
+again precise and substantively large, as it is in all models I
+estimate. The only change here is small and conceivably a result of
+chance or a slight change in model specification. The parameter for the
+Western Europe fixed effect, comfortably discernible from zero at the
+.05 level in Model 4 in the manuscript, barely misses that threshold for
+significance in Figure \ref{fig:plotam30} (\emph{p} = 0.073).
+Importantly, the parameter for the level of terrorism, judicial
+independence, and the interaction between them are unchanged from Model
+4 in the manuscript and Figure \ref{fig:otherterrmods2}.
+
+Figure \ref{fig:showinceuro} shows a caterpillar plot of the estimates
+and conditional variances for the intercepts of each income group and
+the varying slopes for domestic terror threats at each income group.
+Conditional variances for random effect parameters in the mixed effect
+modeling framework do not carry with it the same kind of interpretation
+as a \emph{p} value for a fixed effect. Discussion in this section is
+necessarily about the illustrative value that Figure
+\ref{fig:showinceuro} provides rather than any inferential implication.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{etjc-appendix_files/figure-latex/showinceuro-1.pdf}
+\caption{\label{fig:showinceuro} Caterpillar plot of Varying Intercepts
+for Income Groups and Slopes for Domestic Terror Threat}
+\end{figure}
+
+Figure \ref{fig:showinceuro} still reveals interesting patterns that
+suggest important variation in judicial confidence by different income
+groups and varying effects of domestic terror threats. The caterpillar
+plot suggests a general overall story or trend. The estimated intercepts
+for judicial confidence rise with increases in the income category while
+the effect of domestic terror threats for citizens in states without
+judicial independence decreases for increases in income. It is important
+to reiterate that this an illustrative statement and not an inferential
+statement given what conditional variances in the mixed effect model
+communicate. In the case of the varying slopes for domestic terror
+threats, a negative estimate would not change the sign of the overall
+fixed effect, just that it suggests a dampening effect.
+
+The lowest income group (less than 1,800 euros in annual income) is
+conspicuous in this caterpillar plot. The general trend suggests
+citizens in poorer income groups start lower in their estimated judicial
+confidence. This would square well with conventional wisdom if not the
+particular parameter estimate I report in Model 4 in the manuscript.
+However, the lowest income group appears to start higher in estimated
+level of judicial confidence. Further, the effect of domestic terror
+threats appears to be lower than the \emph{overall} estimated effect in
+the model summarized in Figure \ref{fig:plotam30}, again running counter
+to a general trend that Figure \ref{fig:showinceuro} illustrates.
+
+\newpage
+
+\newpage
+\singlespacing 
+\bibliography{/home/steve/Dropbox/master.bib}
+
+\end{document}

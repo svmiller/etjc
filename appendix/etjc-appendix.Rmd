@@ -1,0 +1,998 @@
+---
+output: 
+  pdf_document:
+    citation_package: natbib
+    fig_caption: true
+    latex_engine: pdflatex
+    keep_tex: true
+    toc: true
+    toc_depth: 2
+    template: ~/Dropbox/miscelanea/svm-r-markdown-templates/svm-latex-ms.tex
+title: "The Effect of Terrorism on Judicial Confidence"
+subtitle: "Supplemental Appendix"
+author:
+- name: Steven V. Miller
+  affiliation: Clemson University
+  email: svmille@clemson.edu
+fontfamily: mathpazo
+fontfamilyoptions: sc, osf
+fontsize: 11pt
+tables: yes
+appendix: yes
+appendixletter: A
+bibliography: ~/Dropbox/master.bib
+biblio-style: apsr
+---
+
+```{r setup, include=FALSE, cache=FALSE, eval=TRUE}
+# knitr::opts_chunk$set(cache=FALSE, kfigr.prefix=TRUE, kfigr.link=TRUE) 
+# setwd("~/Dropbox/projects/terrorism-judiciary/analysis")
+
+Data_EVS <- read.csv("~/Dropbox/projects/etjc/analysis/data-evs.csv")
+
+library(sqldf)
+library(knitr) 
+library(kfigr)
+library(pander)
+library(stargazer)
+library(xtable)
+library(plyr)
+# library(knitr)
+library(lme4)
+library(corrplot)
+library(optimx)
+library(nloptr)
+library(ggplot2)
+library(gridExtra)
+library(ordinal)
+library(texreg)
+library(cem)
+# library(grid)
+# library(gridExtra)
+
+nlopt <- function(par, fn, lower, upper, control) {
+    .nloptr <<- res <- nloptr(par, fn, lb = lower, ub = upper, 
+        opts = list(algorithm = "NLOPT_LN_BOBYQA", print_level = 1,
+        maxeval = 1000, xtol_abs = 1e-6, ftol_abs = 1e-6))
+    list(par = res$solution,
+         fval = res$objective,
+         conv = if (res$status > 0) 0 else res$status,
+         message = res$message
+    )
+}
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+extract.clmm <- function(model, include.thresholds = TRUE,
+    include.loglik = TRUE, include.aic = TRUE,  include.bic = TRUE,
+    include.nobs = TRUE, include.groups = TRUE, include.variance = TRUE, ...) {
+  s <- summary(model, ...)
+
+  tab <- s$coefficients
+  thresh <- tab[rownames(tab) %in% names(s$alpha), ]
+  threshold.names <- rownames(thresh)
+  threshold.coef <- thresh[, 1]
+  threshold.se <- thresh[, 2]
+  threshold.pval <- thresh[, 4]
+  beta <- tab[rownames(tab) %in% names(s$beta), ]
+  beta.names <- rownames(beta)
+  beta.coef <- beta[, 1]
+  beta.se <- beta[, 2]
+  beta.pval <- beta[, 4]
+
+  if (include.thresholds == TRUE) {
+    cfnames <- c(beta.names, threshold.names)
+    coef <- c(beta.coef, threshold.coef)
+    se <- c(beta.se, threshold.se)
+    pval <- c(beta.pval, threshold.pval)
+  } else {
+    cfnames <- beta.names
+    coef <- beta.coef
+    se <- beta.se
+    pval <- beta.pval
+  }
+
+  gof <- numeric()
+  gof.names <- character()
+  gof.decimal <- logical()
+  if (include.loglik == TRUE) {
+    lik <- logLik(model)[1]
+    gof <- c(gof, lik)
+    gof.names <- c(gof.names, "Log Likelihood")
+    gof.decimal <- c(gof.decimal, TRUE)
+  }
+  if (include.aic == TRUE) {
+    aic <- AIC(model)
+    gof <- c(gof, aic)
+    gof.names <- c(gof.names, "AIC")
+    gof.decimal <- c(gof.decimal, TRUE)
+  }
+  if (include.bic == TRUE) {
+    bic <- BIC(model)
+    gof <- c(gof, bic)
+    gof.names <- c(gof.names, "BIC")
+    gof.decimal <- c(gof.decimal, TRUE)
+  }
+  if (include.nobs == TRUE) {
+    n <- nobs(model)
+    gof <- c(gof, n)
+    gof.names <- c(gof.names, "Num.\ obs.")
+    gof.decimal <- c(gof.decimal, FALSE)
+  }
+  if (include.groups == TRUE) {
+    grp <- s$dims$nlev.gf
+    grp.names <- paste0("Groups (", names(grp), ")")
+    gof <- c(gof, grp)
+    gof.names <- c(gof.names, grp.names)
+    gof.decimal <- c(gof.decimal, rep(FALSE, length(grp)))
+  }
+  if (include.variance == TRUE) {
+    var.names <- character()
+    var.values <- numeric()
+    for (i in 1:length(s$ST)) {
+      variances <- diag(s$ST[[i]] %*% t(s$ST[[i]]))
+      var.names <- c(var.names, paste0("Variance: ", names(s$ST)[[i]], ": ", 
+          names(variances)))
+      var.values <- c(var.values, variances)
+    }
+    gof <- c(gof, var.values)
+    gof.names <- c(gof.names, var.names)
+    gof.decimal <- c(gof.decimal, rep(TRUE, length(var.values)))
+  }
+
+  tr <- createTexreg(
+      coef.names = cfnames, 
+      coef = coef, 
+      se = se, 
+      pvalues = pval, 
+      gof.names = gof.names, 
+      gof = gof, 
+      gof.decimal = gof.decimal
+  )
+  return(tr)
+}
+
+setMethod("extract", signature = className("clmm", "ordinal"), 
+    definition = extract.clmm)
+
+show_ranef <- function(data, grp, reorder = TRUE){
+     require(broom)
+     require(reshape2)
+     require(ggplot2)
+     data <- augment(lme4::ranef(data,condVar=TRUE))
+     if(reorder) {
+         data <- data[data$grp == grp,]
+         data$level <- as.character(data$level)
+     }
+     else {}
+     ggplot(data[data$grp == grp,],aes(estimate, level,xmin=lb,xmax=ub))+
+         geom_errorbarh(height=0)+
+         geom_vline(xintercept=0,lty=2)+
+         geom_point()+facet_wrap(~variable,scale="free_x") + 
+         ylab("Levels of the Random Effect") +
+         xlab("Estimated Intercept")
+}
+
+augment.ranef.mer <- function(x,
+                              ci.level=0.9,
+                              reorder=TRUE,
+                              order.var=1) {
+  tmpf <- function(z) {
+    if (is.character(order.var) && !order.var %in% names(z)) {
+      order.var <- 1
+      warning("order.var not found, resetting to 1")
+    }
+    ## would use plyr::name_rows, but want levels first
+    zz <- data.frame(level=rownames(z),z,check.names=FALSE)
+    if (reorder) {
+      ## if numeric order var, add 1 to account for level column
+      ov <- if (is.numeric(order.var)) order.var+1 else order.var
+      zz$level <- reorder(zz$level, zz[,order.var+1], FUN=identity)
+    }
+    ## Q-Q values, for each column separately
+    qq <- c(apply(z,2,function(y) {
+      qnorm(ppoints(nrow(z)))[order(order(y))]
+    }))
+    rownames(zz) <- NULL
+    pv   <- attr(z, "postVar")
+    cols <- 1:(dim(pv)[1])
+    se   <- unlist(lapply(cols, function(i) sqrt(pv[i, i, ])))
+    ## n.b.: depends on explicit column-major ordering of se/melt
+    zzz <- cbind(reshape2::melt(zz,id.vars="level",value.name="estimate"),
+                 qq=qq,std.error=se)
+    ## reorder columns:
+    subset(zzz,select=c(variable, level, estimate, qq, std.error))
+  }
+  dd <- ldply(x,tmpf,.id="grp")
+  ci.val <- -qnorm((1-ci.level)/2)
+  transform(dd,
+            p=2*pnorm(-abs(estimate/std.error)), ## 2-tailed p-val
+            lb=estimate-ci.val*std.error,
+            ub=estimate+ci.val*std.error)
+}
+
+ranef_sd <- function(model, grp){
+  vc <- as.data.frame(lme4::VarCorr(model))
+  result <- vc$sdcor[ vc$grp == grp]
+  result <- sprintf("%.3f", round(result, 3))
+  return(result)
+}
+
+```
+
+\newpage 
+
+# Introduction
+
+This is the supplemental appendix to "The Effect of Terrorism on Judicial Confidence," a manuscript set to appear in *Political Research Quarterly*. The supplemental appendix, like the manuscript, is a dynamic document that automatically generates the code presenting the results within the document itself [@xie2013ddrk]. This approach to document preparation has multiple benefits, namely in the ability to drive the incidence of transcription error to zero while calling specific results into the document. I will make some references in this document to specific statistics that the raw markup will show is a direct extrapolation from code into presentation. The raw markup is available upon request and will be available on my personal Github account upon publication. This will facilitate transparency in published statistical analysis, consistent with the [Data Access and Research Transparency Initiative](http://www.dartstatement.org/) (DA-RT) by the American Political Science Association.
+
+# Descriptive Statistics
+
+I start the supplemental appendix with basic descriptive statistics for the variables I present in the manuscript. I choose to be brief in this section of the appendix since this information is descriptive and provides basic background information about the analyses I present in the manuscript. 
+Table \ref{tab:cys} starts this section with a summary of the countries and years that appear in the analysis. The reader should note that despite appearing in the first two waves of European Values Survey data, Canada and the United States do not appear in the analyses I conduct.
+
+
+```{r suminfo, eval=TRUE, echo=FALSE, tidy = TRUE, size="small", cache=FALSE, results="asis", warning=F, message=F}
+
+
+suminfo <- aggregate(cbind(concourtsd, loggti5ya, gij) ~ country + year, Data_EVS, mean)
+suminfo$year <- as.character(suminfo$year)
+suminfo$gijyn <- factor(suminfo$gij, labels=c("No", "Yes"))
+suminfo$gij <- NULL
+
+
+levels(suminfo$country)[levels(suminfo$country)=="United Kingdom of Great Britain and Northern Ireland"] <- "United Kingdom"
+
+
+print(xtable(suminfo, digits=3, align="clc|ccc"),hline.after = NULL, include.rownames=FALSE, include.colnames = FALSE, 
+  tabular.environment = 'longtable', caption.width = "8.5in",
+  floating = FALSE,
+# file="../appendix/tab-summary-info.tex",
+  add.to.row = list(pos = list(0),command = 
+                        paste("\\caption{Average Judicial Confidence, Terror Level, and Judicial Independence by Country-Year} \n \\label{tab:cys} \n \\\\ \\hline \\hline \n"  ,                          # First caption
+                              " & & \\textbf{Average Confidence} & \\textbf{Level of} & \\textbf{Judicial} \\\\ \n",  
+                              "\\textbf{Country} & \\textbf{Year} & \\textbf{in Judiciary} & \\textbf{Terror Threat} & \\textbf{Independence} \\\\ \\hline \n",   
+        "   \\endfirsthead \n"  ,                          # First caption
+                                 "\\caption[]{Average Judicial Confidence, Terror Level, and Judicial Independence by Country-Year (continued)}  \\\\ \\hline \n", # Additional captions
+                              " & & \\textbf{Average Confidence} & \\textbf{Level of} & \\textbf{Judicial} \\\\ \n",  
+                              "\\textbf{Country} & \\textbf{Year} & \\textbf{in Judiciary} & \\textbf{Terror Threat} & \\textbf{Independence} \\\\ \\hline \n",  
+#                                "\\hline \n",
+                                "\\endhead \n", 
+                                " \\multicolumn{5}{r}{\\footnotesize \\emph{Continued on next page...}} \n \\\\                    
+                                 \\endfoot
+        \\hline \\hline
+                                 \\endlastfoot \n",collapse=" ")), comment=FALSE)
+
+
+```
+
+Table \ref{tab:descript} is basic table of descriptive statistics for all variables used in Table 1 of the manuscript. Recall that all macro-level variables were group-centered (on the survey wave) and standardized by two standard deviations. This scaling was done on a macro-level data frame of the country-years used in the analysis and prior to a merge into the micro-level data frame (of individual-level survey respondents). This is why the scaled micro-level variables all have means of zero and standard deviations of .5 while the macro-level variables slightly deviate from this set mean and standard deviation.
+
+```{r descriptive, eval=TRUE, echo=FALSE, tidy = TRUE, size="small", cache=FALSE, results="asis"}
+descriptive <- with(Data_EVS, data.frame(concourtsd, zg_age, female, collegeed, zg_incgroup, unemployed,
+                                         zg_conparl, zg_udsmean, zg_explogrgdppc, zg_loggti5ya,
+                                         gij, z_timedays, post911, we))
+stargazer(descriptive, title="Descriptive Statistics for Variables Used in the Analysis", header=FALSE, label="tab:descript",
+          covariate.labels=c("Judicial Confidence", "Age", "Female", "College Education", "Income Groups", "Unemployed", 
+                                       "Confidence in Parliament", "Level of Democracy", 
+                                       "Real GDP per Capita", "Level of Terrorism", 
+                                       "Judicial Independence", "Judicial Inefficiency", "Post-9/11 Dummy", 
+                             "Western Europe Dummy"
+                                      ))
+```
+
+Figure \ref{fig:corrmat} provides a correlation matrix of the variables used in the analysis to address preliminary concerns of multicollinearity.[^post911timeday] A correlation matrix presented akin to a "heat map" has multiple benefits over a standard correlation matrix. It weights the visibility of the correlation coefficient by how high the absolute value of Pearson's *r*, drawing the reader's attention to only the important potential sources of collinearity. A standard correlation matrix, by contrast, presents low correlation coefficients visually equivalent to high correlation coefficients, which places an extra burden on the reader to gleam the relevant information. For example, it is of no interest that age and confidence in parliament correlate at `r round(with(Data_EVS, cor(zg_age, zg_conparl, use="complete.obs")), 3)` while the correlation coefficient between the Western Europe dummy and GDP per capita (*r* = `r round(with(Data_EVS, cor(we, zg_explogrgdppc, use="complete.obs")), 3)`) is more important to know for the reader and the researcher. A correlation matrix as "heat map" downplays irrelevant information and emphasizes important information.
+
+[^post911timeday]: There is no correlation coefficient for the post-9/11 dummy and judicial ineffiency because the *Doing Business* project, which is responsible for the judicial ineffiency data, starts after 9/11.
+
+There are a few conspicuous correlation coefficients for variables for which there is an intuitive relationship. Western Europe scores high in democracy relative to other countries in Europe (*r* = `r round(with(Data_EVS, cor(we, zg_udsmean, use="complete.obs")), 3)`) and Western Europe is wealthier than other countries in Europe (*r* = `r round(with(Data_EVS, cor(we, zg_explogrgdppc, use="complete.obs")), 3)`). Democracy and economic wealth travel together (*r* = `r round(with(Data_EVS, cor(zg_udsmean, zg_explogrgdppc, use="complete.obs")), 3)`), an observation well-known to scholars interested in the exact relationship between economic development and democracy [e.g. @przeworskietal2000dd]. Likewise, judicial independence is prominent in Western Europe (*r* = `r round(with(Data_EVS, cor(injud, we, use="complete.obs")), 3)`) and among countries scoring higher in democracy. (*r* = `r round(with(Data_EVS, cor(zg_udsmean, injud, use="complete.obs")), 3)`). This does not surprise those who see Western Europe as more democratic than its other peers in Europe and for scholars who think that judicial independence could be a "necessary condition" for the observation of democracy [e.g. @howardcasey2003ijnd]. However, it does suggest a concern of collinearity in the coefficients. I address this concern with robustness checks in the next section.
+
+```{r corrplot, eval=TRUE, echo=FALSE, tidy = TRUE, size="small", cache=FALSE, results="asis", fig.width=9, fig.height=6, fig.cap="\\label{fig:corrmat} A Correlation Matrix of the Items Used in the Analysis", warning=F, error=F, message=F}
+
+CorrDF <- subset(Data_EVS, select=c(concourtsd, zg_age, female, collegeed, zg_incgroup, unemployed,
+                                         zg_conparl, zg_udsmean, zg_explogrgdppc, zg_loggti5ya,
+                                         injud, z_timedays, post911, we))
+Corr <- cor(CorrDF, use="pairwise.complete.obs")
+colnames(Corr) <- c("Judicial Confidence", "Age", "Female", "College Education", "Income Groups", "Unemployed", 
+                                       "Confidence in Parliament", "Level of Democracy", 
+                                       "Real GDP per Capita", "Level of Terrorism", 
+                                       "Judicial Independence", "Judicial Inefficiency", 
+                    "Post-9/11 Dummy", "Western Europe Dummy")
+rownames(Corr) <- c("Judicial Confidence", "Age", "Female", "College Education", "Income Groups", "Unemployed", 
+                                       "Confidence in Parliament", "Level of Democracy", 
+                                       "Real GDP per Capita", "Level of Terrorism", 
+                                       "Judicial Independence", "Judicial Inefficiency",
+                    "Post-9/11 Dummy", "Western Europe Dummy")
+
+cex.before <- par("cex")
+par(cex = 0.7)
+
+corrplot(Corr, method = "number",  tl.col="black", tl.cex=.8, tl.srt=45, type="lower")
+
+```
+
+# Additional Models and Robustness Checks
+
+This section of the appendix discusses a multitude of robustness checks I conducted in addition to the main findings I report in the manuscript. For simplicity, I choose to present the results of almost all models as coefficient plots rather than regression tables. The rationale here is both aesthetic and practical. Coefficient plots are visually appealing and allow for more regression summaries in a smaller space. 
+
+I further focus most of the robustness tests on what I present as Model 2 in Table 1 in the manuscript. All robustness concerns raised by anonymous reviewers focused on macro-level variables. Micro-level coefficients typically have little bearing on macro-level coefficients (and vice-versa) in multi-level models (beyond concerns of non-random data loss). 
+
+Figure \ref{fig:corrfixef}, a correlation of fixed effects of Model 4 from the manuscript, highlights this negligible effect of micro-level fixed effects on macro-level fixed effects. A correlation matrix of fixed effects in a mixed effects model differs in interpretation from a correlation matrix of raw variables. In this application, they give an approximation of the correlation of the regression coefficients. Put another way, they give us an estimate of what would happen to other regression coefficients in the model if a particular regression coefficient increased or decreased in magnitude.[^mmcor] Notice the bottom-left quadrant of this is almost completely white. This indicates there is practically no discernible effect of a macro-level fixed effect on a micro-level fixed effect. This is true even for the parliamentary confidence fixed effect, which is the most robust and precise fixed effect in any model I estimate.
+
+[^mmcor]: For further discussion: https://stat.ethz.ch/pipermail/r-sig-mixed-models/2009q1/001941.html
+
+
+```{r corrfixef, eval=TRUE, echo=FALSE, tidy = TRUE, cache=TRUE, results="asis", fig.width=10, fig.height=6, fig.cap="\\label{fig:corrfixef} A Correlation Matrix of the Fixed Effects in Model 4 in the Manuscript"}
+
+M4 <- glmer(concourtsd ~ zg_age + female + collegeed + zg_incgroup + unemployed + zg_conparl + we + 
+              zg_udsmean + zg_explogrgdppc + zg_loggti5ya*injud + z_timedays +
+              (1 | country), data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+M4CorrDF <- as.matrix(cov2cor(vcov(M4)))
+M4CorrDF <- M4CorrDF[-1, -1]
+
+colnames(M4CorrDF) <- c("Age", "Female", "College Education", "Income Groups", "Unemployed", 
+                                       "Confidence in Parliament", "Western Europe", "Level of Democracy", 
+                                       "Real GDP per Capita", "Terrorism", 
+                                       "Judicial Independence", "Judicial Inefficiency", "Terrorism*Judicial Independence" )
+rownames(M4CorrDF) <- c("Age", "Female", "College Education", "Income Groups", "Unemployed", 
+                                       "Confidence in Parliament", "Western Europe", "Level of Democracy", 
+                                       "Real GDP per Capita", "Terrorism", 
+                                       "Judicial Independence", "Judicial Inefficiency", "Terrorism*Judicial Independence" )
+
+cex.before <- par("cex")
+par(cex = 0.7)
+
+corrplot(M4CorrDF, method = "number",  tl.col="black", tl.cex=.8, tl.srt=45, type="lower")
+
+
+```
+
+## Assessing the Effects of Western Europe, Democracy, and Real GDP per Capita
+
+I start the robustness tests with a series of regressions that rotate out some variables that may cause collinearity concerns indicated in Figure \ref{fig:corrmat}. These are the real GDP per capita variable, the Western Europe dummy, and the level of democracy variable. Figure \ref{fig:coefstep} summarizes the results of a series of different specifications for Model 2 in the manuscript in which I either omit the democracy variable, Western Europe dummy, or real GDP per capita variable or make that variable the only specified fixed effect among the three variables that all correlate at high levels.
+
+The results I summarize in Figure \ref{fig:coefstep} suggest few meaningful changes to these parameters contingent on the model specification. The Western Europe dummy is positive and significant in all models in which it is estimated. The democracy variable does not obtain statistical significance in any model in which it is estimated. Its inclusion in a particular model has no bearing on the parameter for judicial independence. The only meaningful change concerns the effect of real GDP per capita on judicial confidence, which we observe contingent on the model specification. Its parameter yields a *p* value we can discern from zero when 1) it is the only one of three correlated variables included in the model or 2) the Western Europe dummy is excluded. It is not significant when Western Europe is included and democracy is excluded or when all three are estimated in the same model (as Model 2 in the manuscript).
+
+Importantly, none of the macro-level parameters of interest in the manuscript (i.e. terror threats, judicial independence, and their interaction) are affected by these different model specifications. The concern of correlation among these three variables has implications *only* for the regression parameters for these three variables, not the variables of interest in the manuscript.
+
+
+
+
+```{r stepwise, eval=TRUE, echo=FALSE, tidy = TRUE, cache=TRUE, results="asis", fig.width=9, fig.height=7, fig.cap="\\label{fig:coefstep} Coefficient Plot of Different Specifications for Model 2", warning=F, message=F, error=F}
+
+AM1 <- glmer(concourtsd ~  post911 + we + zg_explogrgdppc + zg_loggti5ya*injud + 
+                      (1 | country) + (1 | country:year), data=subset(Data_EVS),
+             family=binomial(link="logit"),
+             control=glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE))
+
+AM2 <- glmer(concourtsd ~  post911 + zg_udsmean + zg_explogrgdppc + zg_loggti5ya*injud + 
+                      (1 | country) + (1 | country:year), data=subset(Data_EVS),
+             family=binomial(link="logit"),
+             control=glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE))
+
+AM3 <- glmer(concourtsd ~  post911 + we + zg_udsmean + zg_loggti5ya*injud + 
+                      (1 | country) + (1 | country:year), data=subset(Data_EVS),
+             family=binomial(link="logit"),
+             control=glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE))
+
+AM4 <- glmer(concourtsd ~  post911 + zg_udsmean + zg_loggti5ya*injud + 
+                      (1 | country) + (1 | country:year), data=subset(Data_EVS),
+             family=binomial(link="logit"),
+             control=glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE))
+
+AM5 <- glmer(concourtsd ~  post911 + we + zg_loggti5ya*injud + 
+                      (1 | country) + (1 | country:year), data=subset(Data_EVS),
+             family=binomial(link="logit"),
+             control=glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE))
+
+AM6 <- glmer(concourtsd ~  post911 + zg_explogrgdppc + zg_loggti5ya*injud + 
+                      (1 | country) + (1 | country:year), data=subset(Data_EVS),
+             family=binomial(link="logit"),
+             control=glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE))
+
+
+listhold <- list()
+for (i in 1:6) {
+
+  listhold[[i]] <- data.frame(Variable = rownames(summary(get(paste0("AM", i)))$coef),
+                          Coefficient = summary(get(paste0("AM", i)))$coef[, 1],
+                          SE = summary(get(paste0("AM", i)))$coef[, 2],
+modelName = i)
+    Allmodels <- do.call(rbind, listhold)
+  assign(paste0("AM", i, "f"), listhold[[i]])
+
+}
+
+
+interval1 <- -qnorm((1-0.9)/2)  # 90% multiplier
+interval2 <- -qnorm((1-0.95)/2) # 95% multiplier
+
+Allmodels$Variable <- revalue(Allmodels$Variable,
+                              c("(Intercept)"="Intercept", 
+                                "zg_age"="Age",
+                                "female"="Female",
+                                "collegeed"="College Education",
+                                "zg_incgroup"="Income Groups",
+                                "unemployed"="Unemployed",
+                                "zg_conparl"="Confidence in Parliament",
+                                "z_timedays"="Judicial Inefficiency",
+                                "we"="Western Europe",
+                                "post911"="Post-9/11",
+                                "zg_udsmean"="Level of Democracy",
+                                "zg_explogrgdppc"="Real GDP per Capita",
+                                "injud"="Judicial Independence",
+                                "zg_loggti5ya"="Level of Terror Threats",
+                                "zg_loggti5ya:injud"="Terror*Judicial Independence"
+                                ))
+
+ggplot(Allmodels[Allmodels$Variable != "Intercept",], aes(colour = as.factor(modelName), shape=as.factor(modelName))) +
+    geom_hline(yintercept = 0, colour = gray(1/2), lty = 2) + 
+    geom_linerange(aes(x = Variable, ymin = Coefficient - SE*interval1,
+                       ymax = Coefficient + SE*interval1),
+                   lwd = 1, position = position_dodge(width = 1/2)) + 
+    geom_pointrange(aes(x = Variable, y = Coefficient, ymin = Coefficient - SE*interval2,
+                        ymax = Coefficient + SE*interval2),
+                    lwd = 1/2, position = position_dodge(width = 1/2),
+                     fill = "WHITE") + 
+    coord_flip() + theme_bw() +
+    #  ggtitle("Coefficient Plot of ") +
+    scale_colour_discrete(name="Model Specification", 
+                          labels=c("Omit Democracy", "Omit Western Europe Dummy", "Omit Real GDP per Capita",
+                                   "Just Democracy", "Just Western Europe Dummy", "Just Real GDP per Capita")) +
+      scale_shape_manual(name="Model Specification", 
+                          labels=c("Omit Democracy", "Omit Western Europe Dummy", "Omit Real GDP per Capita",
+                                   "Just Democracy", "Just Western Europe Dummy", "Just Real GDP per Capita"), values=c(0, 1, 2, 15, 16, 17))
+
+```
+
+## A Replication with an Ordinal Logistic Mixed Effects Model
+
+The next robustness tests maintains the ordinal level of the dependent variable and re-estimates the models in Table 1 of the manuscript as ordinal logistic mixed effects models. Table \ref{tab:ordinaltab} contains the results of these regressions.
+
+
+```{r ordinalmod, eval=TRUE, echo=FALSE, tidy = TRUE, cache=TRUE, results="asis"}
+
+Data_EVS$countryyear <- with(Data_EVS, paste0(country,":",year))
+
+OM1 <- clmm(factor(concourts) ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya + injud + 
+              (1 | country) + (1 | countryyear), data=subset(Data_EVS),
+            link="logit"
+            )
+
+OM2 <- clmm(factor(concourts) ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya*injud +
+              (1 | country) + (1 | countryyear), data=subset(Data_EVS),
+            link="logit"
+            )
+
+OM3 <- clmm(factor(concourts) ~ zg_age + female + collegeed + zg_incgroup + unemployed + zg_conparl + 
+              post911 + we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya*injud + 
+              (1 | country) + (1 | countryyear), data=subset(Data_EVS),
+            link="logit"
+)
+
+OM4 <- clmm(factor(concourts) ~ zg_age + female + collegeed + zg_incgroup + unemployed + zg_conparl + 
+              we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya*injud + z_timedays +
+              (1 | country), data=subset(Data_EVS),
+            link="logit"
+)
+
+```
+
+```{r ordinaltab, eval=TRUE, echo=FALSE, tidy = TRUE, cache=TRUE, results="asis"}
+
+
+ordinaltab <- capture.output(texreg(list(OM1, OM2, OM3, OM4), digits=3,
+                     caption="Ordinal Mixed Effects Models of Judicial Confidence in European Values Survey",
+                     custom.coef.names=c("Post-9/11 Dummy", "Western Europe Dummy",
+                                         "Level of Democracy", "Real GDP per Capita",
+                                         "Level of Terrorism",
+                                         "Judicial Independence", "1|2", "2|3", "3|4",
+                                         "Level of Terrorism*Judicial Independence",
+                                         "Age", "Female", "College Educated",
+                                         "Income Group", "Unemployed",
+                                         "Confidence in Parliament",
+                                         "Judicial Inefficiency"),
+                     label = "tab:ordinaltab")
+)
+
+ordinaltab <- ordinaltab[-43:-45] # remove AIC, BIC, LL
+ordinaltab <- c(ordinaltab[a <- 1:3], ordinaltab[51:52], ordinaltab[-a]) # move cap, label
+ordinaltab <- ordinaltab[-53:-54] # remove cap, label from bottom
+ordinaltab <- c(ordinaltab[a <- 1:49], ordinaltab[22:27], ordinaltab[-a]) # move thresholds
+ordinaltab <- ordinaltab[-22:-27] # remove thresholds from middle
+ordinaltab <- c(ordinaltab[a <- 1:9], ordinaltab[24:35], ordinaltab[-a]) # move micro-level
+ordinaltab <- ordinaltab[-36:-47] # remove micro-level from middle.
+
+cat(ordinaltab, sep="\n")
+```
+
+There are a few differences between Table \ref{tab:ordinaltab} and Table 1 in the manuscript. The effect of unemployment had no discernible effect on judicial confidence in Table 1 when I condense the dependent variable to a dichotomous measure of judicial confidence. The parameter for unemployed status of the respondent is negative and significant in Model 3 in Table \ref{tab:ordinaltab}; individual-level unemployment decreases individual-level judicial confidence in the third and fourth waves. Similarly, college education is positive and significant in Model 3 in Table \ref{tab:ordinaltab} though not in Model 4. The effect of the Western Europe dummy fails to reach statistical significance in Model 4 in Table \ref{tab:ordinaltab}. The nature of data loss affected the parameter estimate for the Western Europe dummy in the analyses on the fourth wave when the ordinal information of the dependent variable is preserved and modeled, though the effect of the Western Europe dummy was robust to the data loss and subsetting of survey waves in Table 1 in the manuscript. The final changes concern the level of democracy in Model 1 and real GDP per capita variable in Model 4. Both attain statistical significance in Table \ref{tab:ordinaltab} though are insignificant across all estimations in Table 1 in the manuscript. The astute reader will see this is a chance fluctuation in the parameter estimates. Both parameters were actually significant at the .10 level with *p* values approaching .05, but below the hard cut-off I institute in the analyses. Informed readers would know not to make too much into this change in *p* value contingent on the different model specification [e.g. @gelmanstern2006dbs].
+
+This, however, is the full extent of changes between Table 1 in the manuscript and Table \ref{tab:ordinaltab}. The parameter estimates for the level of terror threats, judicial independence, and the interaction between them, are unchanged when the ordinal nature of the dependent variable is modeled rather than condensed to a binary measure.
+
+## A Myriad of Different Ways to Model Terror Threats
+
+I next consider the possibility that the relationships I observe for the macro-level parameters of interest in Table 1 are a function of the way in which I code terrorism. I justify my decision in the manuscript by noting my procedure is identical to how the *Global Terrorism Index* (GTI) [-@gti2014] codes terrorism in its database. The benefits are multiple, namely in its ability to model and weight terror incidents in the years prior to the observation year. However, this is just one way to code terror threats. The robustness of my results may depend on the ability to replicate them with different methods of modeling terror threats.
+
+Figure \ref{fig:otherterrmods2} summarizes a replication of Model 2 using ten different specifications for terror threat levels. The first specification is a latent terror threat specification from an item response model [@samejima1969ela] that produces a continuous estimate of terror threats from the number of terror incidents, the number of successful terror incidents, the number of people killed, the number of people wounded, and the extent of property damage for each of the five years prior to the observation year. The next two terror threat estimates focus on terror incidents that the *Global Terrorism Database* (GTD) [-@gtd2014] codes as having an international element (i.e. for which the perpretators or logistics came from outside the country) or were purely domestic terror incidents. The next terror threat specification subsets terror attacks to those targeting the public rather than the government or military.[^pubtarg] The next five terror threat specifications are the sum of the constituent elements of the terror threat index. These are just the sum of the number of incidents in the year prior to the observation year, the sum of the number of successful incidents, the sum of the number of people killed, the sum of the number of people wounded, and the sum of the property damage on GTD's ordinal scale. I finally include the GTI terror score that I coded and present in the manuscript for comparison.
+
+[^pubtarg]:  A terrorist attack that targets the public includes those targeting businesses, abortion-related services, aircraft (which includes airline employees), educational institutions, food and water supplies, private property, religious figures and institutions, telecommunications, tourists, and public transportation. This measure omits attacks against the government, the police, the military, diplomats, journalists, maritime ports/facilities, non-governmental organizations, terrorists, utilities (e.g. oil pipelines), unknown targets, and violent political parties.
+
+```{r otherterrmods2, eval=TRUE, echo=FALSE, fig.width=9, fig.height=8, fig.cap="\\label{fig:otherterrmods2} Coefficient Plot of Different Terror Threat Specifications for Model 2 in the Manuscript", cache=TRUE}
+
+
+AM9 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_lterrt*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM9f <- data.frame(Variable = rownames(summary(AM9)$coef),
+                          Coefficient = summary(AM9)$coef[, 1],
+                          SE = summary(AM9)$coef[, 2],
+modelName = "Latent Terrorist Threat")
+
+AM10 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya_int*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+
+AM10f <- data.frame(Variable = rownames(summary(AM10)$coef),
+                          Coefficient = summary(AM10)$coef[, 1],
+                          SE = summary(AM10)$coef[, 2],
+modelName = "International Incidents")
+
+AM11 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya_dom*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM11f <- data.frame(Variable = rownames(summary(AM11)$coef),
+                          Coefficient = summary(AM11)$coef[, 1],
+                          SE = summary(AM11)$coef[, 2],
+modelName = "Domestic Incidents")
+
+AM12 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya_pubt*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM12f <- data.frame(Variable = rownames(summary(AM12)$coef),
+                          Coefficient = summary(AM12)$coef[, 1],
+                          SE = summary(AM12)$coef[, 2],
+modelName = "Public-Targeted Incidents")
+
+AM13 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_lognumterror*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM13f <- data.frame(Variable = rownames(summary(AM13)$coef),
+                          Coefficient = summary(AM13)$coef[, 1],
+                          SE = summary(AM13)$coef[, 2],
+modelName = "# of Incidents")
+
+AM14 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_logsuccess*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM14f <- data.frame(Variable = rownames(summary(AM14)$coef),
+                          Coefficient = summary(AM14)$coef[, 1],
+                          SE = summary(AM14)$coef[, 2],
+modelName = "# of Successful Incidents")
+
+AM15 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_lognkill*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM15f <- data.frame(Variable = rownames(summary(AM15)$coef),
+                          Coefficient = summary(AM15)$coef[, 1],
+                          SE = summary(AM15)$coef[, 2],
+modelName = "# of People Killed")
+
+AM16 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_lognwound*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM16f <- data.frame(Variable = rownames(summary(AM16)$coef),
+                          Coefficient = summary(AM16)$coef[, 1],
+                          SE = summary(AM16)$coef[, 2],
+modelName = "# of People Wounded")
+
+AM17 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_logpropextent*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM17f <- data.frame(Variable = rownames(summary(AM17)$coef),
+                          Coefficient = summary(AM17)$coef[, 1],
+                          SE = summary(AM17)$coef[, 2],
+modelName = "Extent of Property Damage")
+
+AM18 <- glmer(concourtsd ~ post911 + we + zg_udsmean + zg_explogrgdppc + zg_loggti5ya*injud +
+                (1 | country) + (1 | country:year) , data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM18f <- data.frame(Variable = rownames(summary(AM18)$coef),
+                          Coefficient = summary(AM18)$coef[, 1],
+                          SE = summary(AM18)$coef[, 2],
+modelName = "GTI Terror Score")
+
+Allmodels <- rbind(AM9f, AM10f, AM11f, AM12f, AM13f, AM14f, AM15f,
+                              AM16f, AM17f, AM18f)
+
+interval1 <- -qnorm((1-0.9)/2)  # 90% multiplier
+interval2 <- -qnorm((1-0.95)/2) # 95% multiplier
+
+Allmodels$Variable <- revalue(Allmodels$Variable,
+                              c("(Intercept)"="Intercept", 
+                                "post911"="Post-9/11",
+                                "we"="Western Europe",
+                                "zg_udsmean"="Level of Democracy",
+                                "zg_explogrgdppc"="Real GDP per Capita",
+                                "zg_lterrt"="Terrorism Variable",
+                                "injud"="Judicial Independence",
+                                "zg_lterrt:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_loggti5ya_int"="Terrorism Variable",
+                                "zg_loggti5ya_int:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_loggti5ya_dom"="Terrorism Variable",
+                                "zg_loggti5ya_dom:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_loggti5ya_pubt"="Terrorism Variable",
+                                "zg_loggti5ya_pubt:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_lognumterror"="Terrorism Variable",
+                                "zg_lognumterror:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_logsuccess"="Terrorism Variable",
+                                "zg_logsuccess:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_lognkill"="Terrorism Variable",
+                                "zg_lognkill:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_lognwound"="Terrorism Variable",
+                                "zg_lognwound:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_logpropextent"="Terrorism Variable",
+                                "zg_logpropextent:injud"="Terrorism Variable*Judicial Independence",
+                                "zg_loggti5ya"="Terrorism Variable",
+                                "zg_loggti5ya:injud"="Terrorism Variable*Judicial Independence"
+                                ))
+
+# == "Terrorism Variable" | Allmodels$Variable == "Judicial Independence" | Allmodels$Variable == "Terrorism Variable*Judicial Independence", 
+
+# != "Intercept", 
+
+
+ggplot(Allmodels[Allmodels$Variable == "Terrorism Variable" | Allmodels$Variable == "Judicial Independence" | Allmodels$Variable == "Terrorism Variable*Judicial Independence", ], aes(colour = modelName, shape=modelName)) +
+  geom_hline(yintercept = 0, colour = gray(1/2), lty = 2) + 
+  geom_linerange(aes(x = Variable, ymin = Coefficient - SE*interval1,
+                                ymax = Coefficient + SE*interval1),
+                            lwd = 1, position = position_dodge(width = 1/2)) + 
+  geom_pointrange(aes(x = Variable, y = Coefficient, ymin = Coefficient - SE*interval2,
+                                 ymax = Coefficient + SE*interval2),
+                             lwd = 1/2, position = position_dodge(width = 1/2),
+                             fill = "WHITE") + 
+  coord_flip() + theme_bw() + 
+#  ggtitle("Coefficient Plot of ") +
+  scale_colour_discrete(name="Terrorism Variable") + 
+  scale_shape_manual(name="Terrorism Variable", values=c(0, 1, 2, 5, 6, 15, 16, 17, 18, 20)) +
+  theme(title = element_text(face="italic", size=10, hjust=0)) +
+  theme(axis.title.x = element_text(face="plain", size=12, hjust=.5)) +
+  theme(axis.title.y = element_text(face="plain", size=12, hjust=.5)) +
+  theme(legend.title = element_text(face="plain", size=12, hjust=.5)) +
+  labs(caption = "\n\n All models include controls for democracy, Western Europe, post-9/11 observations, and real GDP per capita, \n though these are omitted here to save space.")
+
+
+#+ annotation_custom(grob = textGrob("Extra text.  Read all about it"),  
+#        xmin = 5, xmax = 5, ymin = -1.5, ymax = -1.55)
+
+
+ 
+
+```
+
+Figure \ref{fig:otherterrmods2} summarizes these results of these ten different terror threat specifications, though I exclude a presentation of the controls for democracy, Western Europe, post-9/11 observations, and real GDP per capita to save space. The results of these regressions summarized in Figure \ref{fig:otherterrmods2} suggest that the findings consistent with my hypothesis are robust to a myriad of different specifications of terror threats. The effect of the terrorism variable is positive and statistically significant in each application. This is consistent with my contention that high terror threats increase judicial confidence in states without judicial independence. The effect of the interaction is negative and significant in each application. This is consistent with my contention that increasing terror threats decrease judicial confidence in states with judicial independence. Critically, my results do not depend on the measure of terrorism I use. The findings are the same even subsetting to just international terror incidents, domestic terror incidents, or terror incidents that target the public.
+
+## Potential Imbalances in the Data
+
+The manuscript includes partial effects for democracy, judicial independence, and a Western Europe dummy for data I draw from the European Values Survey. This leads to credible concerns for an imbalance in the data as democracy conditions almost all macro-level indicators I employ in the analysis. There are also more democracies in Europe than non-democracies. A simple democracy control variable that I use may be insufficient. I account for this issue with a coarsened exact matching on democracy [@iacusetal2012cibc] in the data. I describe the results below.
+
+```{r matching, eval=TRUE, echo=FALSE, tidy = TRUE, cache=TRUE, results="asis"}
+
+Formatch <- with(Data_EVS, data.frame(country, year, concourtsd, 
+                                      post911, we, zg_explogrgdppc,  zg_udsmean,
+                                      zg_loggti5ya, injud,  politydem7, politydem6)) 
+
+Formatch <- na.omit(Formatch)
+
+
+todrop <- c("concourtsd", 
+            "country", "year","politydem6","politydem7", "we", "post911", "zg_explogrgdppc", "zg_udsmean", "injud") 
+
+imb1 <- imbalance(group=Formatch$politydem6, data=Formatch, 
+          drop=todrop)
+
+
+Matched <- cem(treatment="politydem6", data=Formatch,
+               drop=todrop, keep.all=TRUE
+)
+
+matchtab <- Matched$tab
+colnames(matchtab) <- c("Control", "Treatment")
+
+
+
+imb2 <- imbalance(group=Formatch$politydem6[Matched$matched], 
+          data=Formatch[Matched$matched,], 
+          drop=todrop)
+
+
+Formatch$matched <- Matched$matched
+Formatchsub <- subset(Formatch, matched == TRUE)
+
+AM29 <- glmer(concourtsd ~
+                 post911 + we  + zg_explogrgdppc +  zg_loggti5ya*injud +
+                (1 | country) + (1 | country:year) , data=Formatchsub,
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+AM29f <- data.frame(Variable = rownames(summary(AM29)$coef),
+                          Coefficient = summary(AM29)$coef[, 1],
+                          SE = summary(AM29)$coef[, 2])
+
+prune_num <- ((matchtab[1,1]+matchtab[1,2]) - (matchtab[2,1] + matchtab[2,2]))/(matchtab[1,1]+matchtab[1,2]) 
+prune_num <- paste0(round((prune_num*100)),"%")
+
+```
+
+The concern for imbalance rests on the macro-level variables in the analysis, which is why I restrict an imbalance check to a re-consideration of the results I report in Model 2 in Table 1 in the manuscript. For simplicity's sake, I condense a "treatment" variable of democracy that equals a 1 if the country has a `polity2` score [c.f. @marshalljaggers2002piv] of 7 or greater in the given survey year. Thereafter, I assess balance on the possible variables in the model that democracy is likely to co-determine: the individual-level judicial confidence variable, the macro-level judicial independence variable, and the terror threat variable.
+
+A simple imbalance test of the raw data produces a multivariate imbalance measure ($\mathcal{L}_1$) of `r round(imb1$L1$L1, 3)`. Whereas $\mathcal{L}_1$ is hard-bound between 0 (perfect balance, complete overlap between treatment and control) and 1 (perfect imbalance, no overlap between treatment and control), the $\mathcal{L}_1$ statistic indicates a some important imbalance in the data. Coarsened exact matching on democracy yields more balance in the data. The multivariate imbalance measure ($\mathcal{L}_1$) decreases from `r round(imb1$L1$L1, 3)` to `r round(imb2$L1$L1, 3)` after the coarsened exact matching procedure. However, Table \ref{tab:matchtab} shows that more balance came at the expense of sample size. Those familiar with matching know this as the balance-sample size frontier [@kingetal2017bssf]. Pruning observations from the original data frame provides more balance between treatment and control, but this balance comes at the expense of more precise parameter estimates in the statistical model. Likewise, a failure to prune anything from an original data set maximizes precision in a large-*n* data frame, but leaves aside important questions of potential imbalance. The matching procedure I chose here ultimately prunes `r prune_num` of the original data set for an increase in balance.
+
+
+
+
+```{r matchtab, eval=TRUE, echo=FALSE, results="asis"}
+add_note <- paste0("\\footnotesize$\\mathcal{L}_1$ (unbalanced): ", round(imb1$L1$L1, 3),
+                   "; $\\mathcal{L}_1$ (balanced): ", round(imb2$L1$L1, 3))
+stargazer(matchtab, title="Summary of Matched and Unmatched Observations",
+          header=FALSE, label="tab:matchtab",
+          notes=add_note)
+```
+
+Figure \ref{fig:plotam29} shows my re-estimation of Model 2 with the balanced data, minus the democracy variable on which the data were balanced.[^demdontmatter] It also includes the number of observations (`r format(nobs(AM29),big.mark=",",scientific=FALSE)`), and parameters of interest for the country-year random effect (number of country-years: `r sapply(lme4::ranef(AM29),nrow)["country:year"]`, standard deviation: `r ranef_sd(AM29, "country:year")[[1]]`) and the country random effect (number of countries: `r sapply(lme4::ranef(AM29),nrow)["country"]`, standard deviation: `r ranef_sd(AM29, "country")`). It suggests that the potential loss of efficiency that follows the pruning of `r prune_num` of the original data does not lead to a substantive change in the parameter estimates of importance to my hypotheses. There is still the significant interaction effect. Further, the parameter estimate for the constituent term of terror threats is still positive and significant as well. One somewhat interesting change is the judicial independence measure, which is still negative but now has a *z*-value with more precision (*z* = `r round(AM29f[6,2]/AM29f[6,3], 3)`) albeit one that is still indiscernible from zero. Recall this is a constituent term in an interaction; the coefficient communicates a discernible decrease in individual-level judicial confidence for increasing judicial independence for citizens in states with the mean level of terror threats. A plot of predicted probabilities in Figure \ref{fig:plotam29pred}, similar to what I present in Figure 1 in the manuscript, does not suggest a substantively different interpretation of the interactive relationship between judicial independence and terror threats on individual-level judicial confidence with this coefficient for judicial independence. The results appear "starker" but the interpretation is ultimately the same.
+
+
+```{r plotam29, eval=TRUE, echo=FALSE, fig.cap="\\label{fig:plotam29} Coefficient Plot of Macro-level Model with Matched Data"}
+
+AM29f$Variable <- plyr::revalue(AM29f$Variable,
+                              c("(Intercept)"="Intercept", 
+                                "we"="Western Europe",
+                                "zg_explogrgdppc"="Real GDP per Capita",
+                                "injud"="Judicial Independence",
+                                "zg_loggti5ya"="Terror Threats",
+                                "zg_loggti5ya:injud"="Terror Threats*Judicial Independence",
+                                "post911"="Post-9/11 Dummy"
+                                ))
+
+addlabel <- paste0("Num. obs: ", format(nobs(AM29),big.mark=",",scientific=FALSE), 
+                   "\nNum. Countries: ", sapply(lme4::ranef(AM29),nrow)["country"],
+                   "\nNum. Country-Years: ", sapply(lme4::ranef(AM29),nrow)["country:year"],
+                   "\nCountry Std. Dev.: ", ranef_sd(AM29, "country"),
+                   "\nCountry-Year Std. Dev.: ", ranef_sd(AM29, "country:year")[[1]]
+                   )
+
+ggplot(AM29f[AM29f$Variable != "Intercept",]) +
+  geom_hline(yintercept = 0, colour = gray(1/2), lty = 2) + 
+  geom_linerange(aes(x = Variable, ymin = Coefficient - SE*interval1,
+                                ymax = Coefficient + SE*interval1),
+                            lwd = 1, position = position_dodge(width = 1/2)) + 
+  geom_pointrange(aes(x = Variable, y = Coefficient, ymin = Coefficient - SE*interval2,
+                                 ymax = Coefficient + SE*interval2),
+                             lwd = 1/2, position = position_dodge(width = 1/2),
+                             shape = 21, fill = "WHITE") + 
+  coord_flip() + theme_bw() + 
+#  ggtitle("Coefficient Plot of ") +
+  scale_colour_discrete(name="Terrorism Variable")  + 
+#  ggtitle("Coefficient Plot of ") +
+  annotate(geom = "text", x = 1.5, y = 6,
+             label = addlabel,
+             hjust = 1, size =2.5)
+```
+
+
+Ultimately, matching, and pruning `r prune_num` of the original data, do not change the important results I present in the manuscript.
+
+[^demdontmatter]: Figure \ref{fig:coefstep} suggests the level of democracy variable ultimately has no bearing on individual-level judicial confidence anyway.
+
+```{r plotam29pred, eval=TRUE, echo=FALSE, fig.cap="\\label{fig:plotam29pred} The Interaction between Judicial Independence and Terror Threats on Judicial Confidence from Figure \\ref{fig:plotam29}", warning=F, message=F}
+
+AM29_values <- with(Formatchsub, 
+                  data.frame(
+                    post911=median(post911),
+                    we=median(we),
+                    zg_explogrgdppc = mean(zg_explogrgdppc), 
+                    zg_loggti5ya=rep(seq(from = min(zg_loggti5ya), 
+                                           to = max(zg_loggti5ya), length.out = 201), 2), 
+                    injud=c(min(injud, na.rm=TRUE), max(injud, na.rm=TRUE))
+
+                  )) 
+
+AM29_values <- arrange(AM29_values, injud)
+AM29_values$"zg_loggti5ya:injud" <- with(AM29_values, zg_loggti5ya*injud)
+
+require(AICcmodavg)
+AM29_predvalues <- cbind(AM29_values, predictSE(AM29, newdata = AM29_values, 
+                                            type = "link", se.fit = TRUE, re.form=NA))
+AM29_predvalues$pp <- with(AM29_predvalues, plogis(fit))
+AM29_predvalues$lb <- with(AM29_predvalues, plogis(fit - (1.645 * se.fit)))
+AM29_predvalues$ub <- with(AM29_predvalues, plogis(fit + (1.645 * se.fit)))
+
+AM29_predvalues$cat <- NA
+AM29_predvalues$cat[AM29_predvalues$injud == 0] <- "No Judicial Independence"
+AM29_predvalues$cat[AM29_predvalues$injud == 2] <- "Judicial Independence"
+AM29_predvalues <- rename(AM29_predvalues, c(cat="Category"))
+
+ggplot(AM29_predvalues, aes(x = zg_loggti5ya, y = pp)) + 
+  geom_errorbar(aes(ymin = lb, ymax = ub), alpha = 0.2, linetype = 1) + 	
+  geom_line(aes(colour = Category, linetype = Category), size = 1) +
+  ylab("Predicted Probability of Judicial Confidence") +
+  xlab("Range of Terror Threat") +
+  theme(legend.background = element_rect(fill = "gray99"),  legend.position="bottom") +
+  theme(panel.background = element_rect(fill = "gray99")) +  
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by=.1)) +
+  scale_x_continuous(breaks=c(seq(-1,1, by=.1)), limits=c(-1, 1))
+```
+
+## Domestic Terror Threats and Varying Effects by Income
+
+Reviewer #3 expressed an interest in possible heterogeneity of domestic terror threats by an individual-level attribute like income. This is difficult to evaluate with European Values Survey (EVS) data for a variety of reasons. Namely, EVS does not consistently ask sociodemographic questions across countries or waves. In fact, several important sociodemographic variables, like education, do not appear until the third wave of data in the late 1990s. Further, income questions vary considerably across countries and waves. The three-part ordinal income group variable I use in the manuscript represents the best means to standardize these income questions across all four waves, but the type of model for which R3 asked (a varying slope for terror threats across each level of the income group category) would balk at the idea of allowing a slope to vary for just three income groups. The ensuing parameter estimate would not be reliable.
+
+
+```{r inceuromod, eval=TRUE, echo=FALSE,  cache=TRUE}
+
+Data_EVS$inceuro <- factor(Data_EVS$inceuro, 
+                           levels = c("1", "2", "3", "4", "5", "6",
+                                      "7", "8", "9", "10", "11", "12"))
+
+Data_EVS$inceuro <- revalue(Data_EVS$inceuro,
+                              c("1"="01: Less than 1,800", "2"="02: 1,800 to 3,600",
+                                "3"="03: 3,600 to 6,000", 
+                                "4"="04: 6,000 to 12,000", "5"="05: 12,000 to 18,000",
+                                "6"="06: 18,000 to 24,000", "7"="07: 24,000 to 30,000", 
+                                "8"="08: 30,000 to 36,000", 
+                                "9"="09: 36,000 to 60,000", "10"="10: 60,000 to 90,000",
+                                "11"="11: 90,000 to 120,000", "12"="12: 120,000 or more"
+                                ))
+
+
+AM30 <- glmer(concourtsd ~ zg_age + female + collegeed + unemployed + zg_conparl + we + 
+              zg_udsmean + zg_explogrgdppc + zg_loggti5ya_dom*injud + z_timedays +
+              (1 | country) + (1 + zg_loggti5ya_dom | inceuro), data=subset(Data_EVS),
+            family=binomial(link="logit")
+            ,control = glmerControl(optimizer = "nloptwrap", calc.derivs = FALSE)  
+)
+
+
+AM30f <- data.frame(Variable = rownames(summary(AM30)$coef),
+                          Coefficient = summary(AM30)$coef[, 1],
+                          SE = summary(AM30)$coef[, 2])
+
+
+```
+
+I identify a work-around to accommodate R3. The fourth wave of EVS asks a more granular question of income by reference to self-placement of annual income into income groups denominated in euros. These income categories are 1) less than 1,800 euros, 2) 1,800 euros to less than 3,600 euros, 3) 3,600 euros to less than 6,000 euros, 4) 6,000 euros to less than 12,000 euros, 5) 12,000 euros to less than 18,000 euros, 6) 18,000 euros to less than 24,000 euros, 7) 24,000 euros to less than 30,000 euros, 8) 30,000 euros to less than 36,000 euros, 9) 36,000 euros to less than 60,000 euros, 10), 60,000 euros to less than 90,000 euros, 11) 90,000 euros to less than 120,000 euros, and 12) 120,000 euros or more earned annually. The model that I then estimate is similar to Model 4 in the manuscript, though it substitutes the fixed effect of the three-part income group variable for the random effect of the 12-item income group category and it replaces the terror threat variable with the domestic terror threat variable that I estimate and show in Figure \ref{fig:otherterrmods2}. I summarize the results with the coefficient plot in Figure \ref{fig:plotam30}, which includes other statistics of interest like the number of observations (`r format(nobs(AM30),big.mark=",",scientific=FALSE)`), and parameters of interest for the income group random effect (number of groups: `r sapply(lme4::ranef(AM30),nrow)["inceuro"]`, standard deviation: `r ranef_sd(AM30, "inceuro")[[1]]`) and the country random effect (number of countries: `r sapply(lme4::ranef(AM30),nrow)["country"]`, standard deviation: `r ranef_sd(AM30, "country")`).
+
+```{r plotam30, eval=TRUE, echo=FALSE, fig.cap="\\label{fig:plotam30} Coefficient Plot of Correlates of Judicial Confidence in Fourth Wave of EVS", fig.width=9}
+
+AM30f$Variable <- factor(AM30f$Variable , 
+                         levels = c("(Intercept)", "zg_loggti5ya_dom:injud", "zg_loggti5ya_dom",
+                                    "injud", "z_timedays", "zg_explogrgdppc", "zg_udsmean",
+                                    "we", "zg_conparl",
+                                    "unemployed", "collegeed", "female", "zg_age"))
+
+AM30f$Variable <- revalue(AM30f$Variable,
+                              c("(Intercept)"="Intercept",
+                                "zg_age"="Age",
+                                "female"="Female",
+                                "collegeed"="College Education",
+                                "unemployed"="Unemployed",
+                                "zg_conparl"="Confidence in Parliament",
+                                "we"="Western Europe",
+                                "zg_udsmean"="Level of Democracy",
+                                "zg_explogrgdppc"="Real GDP per Capita",
+                                "injud"="Judicial Independence",
+                                "zg_loggti5ya_dom"="Domestic Terror Threat",
+                                "zg_loggti5ya_dom:injud"="Domestic Terror Threat*Judicial Independence",
+                                "z_timedays"="Judicial Ineffiency"
+                                ))
+
+addlabel <- paste0("Num. obs: ", format(nobs(AM30),big.mark=",",scientific=FALSE), 
+                   "\nNum. Countries: ", sapply(lme4::ranef(AM30),nrow)["country"],
+                   "\nNum. Income Groups: ", sapply(lme4::ranef(AM30),nrow)["inceuro"],
+                   "\nCountry Std. Dev.: ", ranef_sd(AM30, "country"),
+                   "\nIncome Group Std. Dev.: ", ranef_sd(AM30, "inceuro")[[1]]
+                   )
+
+ggplot(AM30f[AM30f$Variable != "Intercept",]) +
+  geom_hline(yintercept = 0, colour = gray(1/2), lty = 2) + 
+  geom_linerange(aes(x = Variable, ymin = Coefficient - SE*interval1,
+                                ymax = Coefficient + SE*interval1),
+                            lwd = 1, position = position_dodge(width = 1/2)) + 
+  geom_pointrange(aes(x = Variable, y = Coefficient, ymin = Coefficient - SE*interval2,
+                                 ymax = Coefficient + SE*interval2),
+                             lwd = 1/2, position = position_dodge(width = 1/2),
+                             shape = 21, fill = "WHITE") + 
+  coord_flip() + theme_bw() + 
+#  ggtitle("Coefficient Plot of ") +
+  annotate(geom = "text", x = 11, y = 2,
+             label = addlabel,
+             hjust = 1, size =3)
+```
+
+The results summarized in Figure \ref{fig:plotam30} square well with the results I provide in Model 4 in the manuscript. The gender fixed effect for women is statistically discernible from zero though its estimated effect is substantively small. The effect of confidence in parliament is again precise and substantively large, as it is in all models I estimate. The only change here is small and conceivably a result of chance or a slight change in model specification. The parameter for the Western Europe fixed effect, comfortably discernible from zero at the .05 level in Model 4 in the manuscript, barely misses that threshold for significance in Figure \ref{fig:plotam30} (*p* = `r round(1.96*pnorm(-abs(AM30f[7, 2]/AM30f[7, 3])), 3)`). Importantly, the parameter for the level of terrorism, judicial independence, and the interaction between them are unchanged from Model 4 in the manuscript and Figure \ref{fig:otherterrmods2}.
+
+Figure \ref{fig:showinceuro} shows a caterpillar plot of the estimates and conditional variances for the intercepts of each income group and the varying slopes for domestic terror threats at each income group. Conditional variances for random effect parameters in the mixed effect modeling framework do not carry with it the same kind of interpretation as a *p* value for a fixed effect. Discussion in this section is necessarily about the illustrative value that Figure \ref{fig:showinceuro} provides rather than any inferential implication.
+
+
+```{r showinceuro, warning=F, message=F, echo=F, eval=T, fig.cap="\\label{fig:showinceuro} Caterpillar plot of Varying Intercepts for Income Groups and Slopes for Domestic Terror Threat"}
+AM30p <- show_ranef(AM30, "inceuro", reorder=TRUE) + 
+  facet_wrap(~variable,scale="free_x", labeller = as_labeller(c(`(Intercept)` = "Intercept", `zg_loggti5ya_dom`="Domestic Terror Threat"))) + 
+  ylab("")  + theme_bw()
+
+AM30p
+```
+
+Figure \ref{fig:showinceuro} still reveals interesting patterns that suggest important variation in judicial confidence by different income groups and varying effects of domestic terror threats. The caterpillar plot suggests a general overall story or trend. The estimated intercepts for judicial confidence rise with increases in the income category while the effect of domestic terror threats for citizens in states without judicial independence decreases for increases in income. It is important to reiterate that this an illustrative statement and not an inferential statement given what conditional variances in the mixed effect model communicate. In the case of the varying slopes for domestic terror threats, a negative estimate would not change the sign of the overall fixed effect, just that it suggests a dampening effect. 
+
+The lowest income group (less than 1,800 euros in annual income) is conspicuous in this caterpillar plot. The general trend suggests citizens in poorer income groups start lower in their estimated judicial confidence. This would square well with conventional wisdom if not the particular parameter estimate I report in Model 4 in the manuscript. However, the lowest income group appears to start higher in estimated level of judicial confidence. Further, the effect of domestic terror threats appears to be lower than the *overall* estimated effect in the model summarized in Figure \ref{fig:plotam30}, again running counter to a general trend that Figure \ref{fig:showinceuro} illustrates.
+
+\newpage
