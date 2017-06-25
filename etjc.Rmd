@@ -2,13 +2,14 @@
 output: 
   pdf_document:
     citation_package: natbib
-    keep_tex: false
+    keep_tex: true
     fig_caption: true
     latex_engine: pdflatex
     template: ~/Dropbox/miscelanea/svm-r-markdown-templates/svm-latex-ms.tex
 geometry: margin=1in
 title: "The Effect of Terrorism on Judicial Confidence"
-thanks: "The author thanks---but cannot blame---Matthew Clary, Chris Kromphardt, Julia West, and the editors and three anonymous reviewers at *Political Research Quarterly* for their comments on previous versions of this manuscript. Replication files are available on the author's Github account ([github.com/svmiller](https://github.com/svmiller)). **Corresponding author**: svmille@clemson.edu."
+thanks: "**Corresponding author**: Steven V. Miller, Department of Political Science, Clemson University, 232 Brackett Hall, Clemson, SC 29634-1354. Email: svmille@clemson.edu."
+# The author thanks---but cannot blame---Matthew Clary, Chris Kromphardt, Julia West, and the editors and three anonymous reviewers at *Political Research Quarterly* for their comments on previous versions of this manuscript. Replication files are available on the author's Github account ([github.com/svmiller](https://github.com/svmiller)).
 author:
 - name: Steven V. Miller
   affiliation: Clemson University
@@ -18,10 +19,11 @@ abstract: "Independent judiciaries prevent democratic reversals, facilitate peac
 fontfamily: mathpazo
 fontfamilyoptions: sc, osf
 fontsize: 11pt
-keywords: "terrorism, judicial confidence, liberty-security dilemma"
+keywords: "terrorism, judicial confidence, judicial independence, liberty-security dilemma"
 bibliography: ~/Dropbox/master.bib
 biblio-style: apsr
 anonymous: no
+endnotes: yes
 ---
 
 ```{r loadpackages, echo=F, message=F, warning=F, error=F}
@@ -72,6 +74,8 @@ source('analysis/2b-clean-evs-macro.R')
 source('analysis/3-analysis.R')
 ```
 
+
+
 # Introduction
 
 
@@ -82,6 +86,7 @@ The independence the British judicial system enjoys may actually be part of the 
 In this paper, I generalize from the British case and argue a general relationship between terror threats and individual-level confidence in the judicial system across four waves of European Values Survey data. I argue that terror groups engage in attacks that target citizens and use violent fear tactics to coerce support for policies in line with the terror group's preferences. Citizens targeted by these terror attacks offset the subsequent fear these attacks instill by rallying around their leaders to provide for their security. This support for state leadership provides leverage in inter-branch relations as rally effects induce acquiescence from political rivals to the leader's agenda. I show this extends to individual-level evaluations of the judiciary as well. Under conditions of high terror threat, citizens lose confidence in their judicial system that they interpret as providing due process and legal protections for suspected terrorists and terror groups. Paradoxically, we observe the negative effects of terror threats on judicial confidence the *more* independent the judicial system is from other branches of government. This interactive effect allows for governments to reintegrate more judicial processes into the executive branch like we are currently observing in France after *Charlie Hebdo*, and have observed in the United States since 2001.
 
 The rest of this paper starts with a review of the importance of independent judiciaries to democratic governance and what explains confidence citizens have in these important institutions of government. Thereafter, I outline my theory about how terror threats negatively affect individual-level confidence in the judicial system and why this effect is contingent on the independence of the judiciary from other branches of government. This leads to the next two sections that detail my research design and the results of mixed effects models of four waves of European Values Survey data and 29 years of Global Terrorism Database data. I conclude with implications of my analyses.
+
 
 # Judicial Independence and Confidence: The Importance of Two Concepts
 
@@ -103,6 +108,7 @@ What explains when citizens have confidence in their judicial system given its i
 However, such a simple conclusion about the sources of judicial confidence belies policy changes we have observed in some democracies in the War on Terror era. Citizens in these countries appear to be losing confidence in their judicial system despite what otherwise looks to be an efficient and independent judiciary in a comparative perspective. The particulars of American public opinion on this topic are surprising. @huddyetal2005tas find that citizens surveyed from October 2001 to March 2002 who had a high perceived threat of a future terrorist attack were much more likely to support Bush-era policies at the heart of the War on Terror. The effects were not just directed at Arab-Americans as an in-group/out-group effect. Importantly, they were more likely to support government monitoring of telephones and e-mails and were more likely to rescind their own civil liberty benefits for the cause of security. @hetheringtonsuhay2011ata find a similar effect for perceived terror threats on warrantless wiretapping, torture, media censorship, and broad public surveillance measures. All the policies that citizens support run counter to the legal protections provided by independent judiciaries in democratic systems. In other words, American citizens worried about terror threats are likely to support policies that infringe upon civil liberties that independent judicial systems are supposed to protect. Whereas the United States consistently ranks near the top among democracies for judicial efficiency measures gathered in the *Doing Business* project by the World Bank, public support for these policies indicates decreasing judicial confidence as a function of terror threats.
 
 In the next section, I outline a theory that links terror threats to decreasing judicial confidence among citizens.
+
 
 # Terror Threats, Terror Management, and Attitudes toward the Judicial System
 
@@ -172,21 +178,21 @@ Though my hypotheses concern macro-level effects on individual-level attitudes o
 
 Table \ref{tab:regtable} shows the results of the mixed effects models that estimate individual-level attitudes of judicial confidence. I start with a discussion of Model 1.
 
-
-
 ```{r regtable, echo=F, results="asis"}
 cat(Regtable, sep='\n')
 ```
 
 
-Model 1 estimates a minimal macro-level model without an interaction between terror threat levels and judicial independence. The results show no independent partial effect for either judicial independence or terror threat levels on individual-level judicial confidence. The null findings in Model 1 are prima facie consistent with the hypothesis that the effect of terror threats depends on the level of judicial independence in the country. This minimal macro-level model results in only two regression parameters discernible from zero. The Western Europe dummy is positive and significant in Model 1 and even the remaining models, suggesting important heterogeneity between Western Europe and the rest of the European Values Survey countries over four waves of EVS data. This is the only regression paramater significant in Model 1 and the .05 level.
+
+Model 1 estimates a minimal macro-level model without an interaction between terror threat levels and judicial independence. The results show no independent partial effect for either judicial independence or terror threat levels on individual-level judicial confidence. The null findings in Model 1 are prima facie consistent with the hypothesis that the effect of terror threats depends on the level of judicial independence in the country. This minimal macro-level model results in only one regression parameter discernible from zero. The Western Europe dummy is positive and significant in Model 1 and even the remaining models, suggesting important heterogeneity between Western Europe and the rest of the EVS countries over four waves of EVS data. This is the only regression paramater significant in Model 1 at the .05 level.
 
 
 Model 2 adds an interactive term between terror threat levels and judicial independence. The results here are consistent with the hypothesis' prediction of a relationship between terror threat and judicial confidence that is contingent on the independence of the judiciary. The coefficient for the interaction is negative and statistically significant. Citizens in states with higher levels of terrorism and in countries whose judiciaries are independent from other political or societal actors have less confidence in the judicial system and judicial process. Consider the interpretation of the coefficient for terror threat levels as well. The coefficient for terror threat levels in the interaction model specifies the estimated effect of increasing terror threats on citizen attitudes toward the judiciary when the judicial independence variable is zero (i.e. judicial dependence on other political institutions). Therefore, we would conclude that citizens in countries with higher terror threat levels and without independent judiciaries generally have more confidence in their judicial system. 
 
 Model 3 adds the individual-level control variables similar to those specified by @buhlmannkunz2011cj. Only the coefficients for age, female, and confidence in parliament are discernible from zero. Older citizens and less likely to have confidence in their judicial system though women are more likely to have confidence in their judicial system. Citizens who have more confidence in their legislative branch of government are also likely to have confidence in their judicial system as well. Whereas I scale all variables by two standard deviations to approximate a same scale among binary and non-binary predictors, we can have some confidence at first glance that the effect of confidence in parliament is the largest of all the predictors, and certainly the most precise. Importantly, the inclusion of micro-level control variables do not meaningfully influence the coefficients for the macro-level variables. The interaction between terror threats and judicial independence is still negative and statistically significant. This is consistent with my theory that citizens lose faith in their judicial system and judicial process because citizens perceive that judicial process provides protections for suspected terrorists.
 
-Model 4 add an important macro-level control variable for judicial efficiency. While judicial efficiency may confound the relationship between the independent and dependent variables of interest, our best available data for judicial efficiency (from the World Bank's *Doing Business* project) comes only after 2004. This restricts the analyses to just the fourth wave of EVS data and drops the post-9/11 dummy from the model. Model 4 shows a significant effect of judicial efficiency---as measured in average calendar days from a plaintiff's lawsuit until the final restitution of the claim---and judicial confidence. Longer durations suggest less efficient judicial systems, which leads to less confidence among citizens in the judicial process. However, the inclusion of judicial efficiency as an important correlate and the restriction of the analyses to just the fourth EVS wave do not meaningfully affect the parameter estimates associated with judicial independence, terror threat levels, and the interaction between the two. Citizens in states with high levels of terrorism and independent judiciaries are less likely to have confidence in their judicial system.
+Model 4 adds an important macro-level control variable for judicial efficiency. While judicial efficiency may confound the relationship between the independent and dependent variables of interest, our best available data for judicial efficiency (from the World Bank’s *Doing Business* project) come only after 2004. This restricts the analyses to just the fourth wave of EVS data and drops the post-9/11 dummy from the model. Model 4 shows a significant effect of judicial inefficiency—as measured in average calendar days from a plaintiff’s lawsuit until the final restitution of the claim—and judicial confidence. Longer durations suggest less efficient judicial systems, which leads to less confidence among citizens in the judicial process. However, the inclusion of judicial inefficiency as an important correlate and the restriction of the analyses to just the fourth EVS wave do not meaningfully affect the parameter estimates associated with judicial independence, terror threat levels, and the interaction between the two. Citizens in states with high levels of terrorism and independent judiciaries are less likely to have confidence in their judicial system.
+
 
 ```{r graph, echo=F, results="asis", fig.cap="The Interaction between Judicial Independence and Terror Threats on Judicial Confidence", fig.width=8, warning=F}
 ggplot(M2_predvalues, aes(x = zg_loggti5ya, y = pp)) + 
@@ -200,6 +206,7 @@ ggplot(M2_predvalues, aes(x = zg_loggti5ya, y = pp)) +
   scale_x_continuous(breaks=c(seq(-1.1,1.1, by=.1)), limits=c(-1.1,1.1))
 
 ```
+
 
 Figure 1 displays quantities of interest from Model 2 and presented in Table \ref{tab:regtable}. I set all but the variables of interest at their typical value, for each independent variable shown in Model 2. Then, I generated 300 observations across the entire range of the terror threat variable, repeated twice. I code half of the observations on the judicial independence variable with the minimum of zero (i.e. no judicial independence) while I code the other half with the maximum score of 2 (i.e. judicial independence). I multiplied the values of the terror threat variable by the judicial independence variable to code the interactive effect. Thereafter, I generated predicted probabilities of judicial confidence with standard errors on those predictions. Figure 1 presents the results of those predicted probabilities with 90% confidence intervals.
 
@@ -216,7 +223,7 @@ My manuscript starts with a puzzling observation about the lack of confidence Br
 
 I argue that the independence of the British judiciary from other state and societal actors and its strength in protecting civil liberties may counterintuitively be part of the problem for British judicial confidence. Further, the United Kingdom has a long history of terror threats, unlike some of its Western European peers with higher levels of judicial confidence. The United Kingdom diverges from the "flexible", security-oriented judicial model that France has [@foley2013ctbf] and instead implements a rigorous system that provides legal protections of due process for terror suspects. As a result, citizens lose confidence in a judicial system that provides unwanted due process to suspected terrorists. My analysis extends the observation about the British puzzle to the rest of Europe using four waves of EVS data from 1982 to 2009 and finds a statistically significant negative interaction between terror threats and judicial independence on individual-level judicial confidence. 
 
-This has important implications for how we understand the "liberty-security dilemma." This problem underlines many issues in current U.S. foreign policy <!--[@rosatiscott2014pusf] --> but it is a familiar problem for democratic governments and political science scholarship.<!--[^bay1958]--> My findings suggest multiple ways to think about this issue further. Most scholars and policymakers sympathetic to the restriction of judicial protections of liberty in the name of security couch their arguments on normative grounds. @posnervermeule2007tb argue that courts should defer to executives because courts are slow and rigid while the executive has an endowment advantage and the ability to act in secrecy for the cause of counter-terrorism. They even contend that errors that infringe on judicial process are natural and even desirable when compared to the alternatives proposed by staunch civil libertarians. @yoo2006wom, known for his infamous tenure as George W. Bush's Deputy Assistant U.S. Attorney General, authored numerous defenses of Bush-era policies ranging from the military prisons to the USA PATRIOT Act based on the nature of the combatant and the War on Terror. His defense was also normative in tone. More recent political science scholarship has countered this argument with formal models that show restrictions in liberty are not necessary for security [@dragu2011itt], that rigorous judicial review can lead to more informed policy-making even in the absence of policy expertise in the judiciary [@draguboard2015jrsp], and that judicial deference implied may lead to suboptimal counter-terror provisions [@bdm2007psp; @dragupolborn2014rlft].
+This has important implications for how we understand the "liberty-security dilemma." This problem underlines many issues in current U.S. foreign policy <!--[@rosatiscott2014pusf] --> but it is a familiar problem for democratic governments and political science scholarship.<!--[^bay1958]--> My findings suggest multiple ways to think about this issue further. Most scholars and policymakers sympathetic to the restriction of judicial protections of liberty in the name of security couch their arguments on normative grounds. @posnervermeule2007tb argue that courts should defer to executives because courts are slow and rigid while the executive has an endowment advantage and the ability to act in secrecy for the cause of counter-terrorism. They even contend that errors that infringe on judicial process are natural and even desirable when compared with the alternatives proposed by staunch civil libertarians. @yoo2006wom, known for his infamous tenure as George W. Bush's Deputy Assistant U.S. Attorney General, authored numerous defenses of Bush-era policies ranging from the military prisons to the USA PATRIOT Act based on the nature of the combatant and the War on Terror. His defense was also normative in tone. More recent political science scholarship has countered this argument with formal models that show restrictions in liberty are not necessary for security [@dragu2011itt], that rigorous judicial review can lead to more informed policy-making even in the absence of policy expertise in the judiciary [@draguboard2015jrsp], and that judicial deference implied may lead to suboptimal counter-terror provisions [@bdm2007psp; @dragupolborn2014rlft].
 
 My analysis illuminates the claims made by proponents of restricting civil liberties for national security, though my analysis is empirical and not normative. These executive-led policies that infringe on legal protections provided by an independent judiciary follow because citizens under terrorist duress look to the executive to provide counter-terrorism and provide for their security. My analysis suggests citizens seem to agree with @posnervermeule2007tb that courts are slow and rigid and should not be threatening judicial review when security is at stake. Public opinion may provide the leverage for state leaders to absorb some judicial processes into the executive under conditions of high terror threat.
 
@@ -231,4 +238,19 @@ My analysis has some final implications for the scholarly study of judicial inde
 \newpage
 
 
+# Acknowledgements
+
+The author thanks---but cannot blame---Matthew Clary, Chris Kromphardt, Julia West, and the editors and three anonymous reviewers at *Political Research Quarterly* for their comments on previous versions of this manuscript. 
+
+# Declaration of Conflicting Interests
+
+The author declared no potential conflicts of interest with respect to the research, authorship, and/or publication of this article.
+
+# Funding
+
+The author received no financial support for the research, authorship, and/or publication of this article.
+
+# Supplemental Material
+
+Replication files are available on the author's Github account ([github.com/svmiller](https://github.com/svmiller)).
 
